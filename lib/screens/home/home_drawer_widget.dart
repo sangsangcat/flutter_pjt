@@ -21,7 +21,7 @@ class HomeDrawerWidget extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.info),
             title: Text('About'),
-            onTap: (){
+            onTap: () {
               //Drawer 를 닫는다..
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.about);
