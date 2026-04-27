@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pjt/providers/trip_provider.dart';
+import 'package:provider/provider.dart';
 import './routes/app_routes.dart';
 import './screens/home_screen.dart';
 
@@ -15,13 +17,16 @@ class TripApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //테마설정 + 라우팅 등록 + 앱 전역 상태 등록
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => TripProvider())],
+      child: MaterialApp(
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        ),
+        debugShowCheckedModeBanner: false,
+        initialRoute: AppRoutes.home,
+        routes: {AppRoutes.home: (context) => HomeScreen()},
       ),
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.home,
-      routes: {AppRoutes.home: (context) => HomeScreen()},
     );
   }
 }
