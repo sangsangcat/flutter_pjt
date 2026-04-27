@@ -27,6 +27,15 @@ class HomeDrawerWidget extends StatelessWidget {
               Navigator.pushNamed(context, AppRoutes.about);
             },
           ),
+          ListTile(
+            leading: Icon(Icons.person),
+            title: Text('My Info'),
+            onTap: () {
+              //Drawer 를 닫는다..
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.myInfo);
+            },
+          ),
         ],
       ),
     );
