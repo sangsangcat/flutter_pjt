@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/trip_provider.dart';
+import 'package:flutter_pjt/screens/home/home_drawer_widget.dart';
 import 'package:flutter_pjt/screens/home/home_grid_widget.dart';
 import 'package:flutter_pjt/screens/home/home_middle_widget.dart';
 import 'package:flutter_pjt/screens/home/home_top_widget.dart';
@@ -16,6 +17,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(onPressed: (){}, icon: Icon(Icons.more_vert)),
         ],
       ),
+      drawer: HomeDrawerWidget(),
       body: Column(
         children: [
           HomeTopWidget(),
