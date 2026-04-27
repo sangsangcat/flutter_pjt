@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pjt/routes/app_routes.dart';
 
 class HomeDrawerWidget extends StatelessWidget {
   @override
@@ -21,7 +22,9 @@ class HomeDrawerWidget extends StatelessWidget {
             leading: Icon(Icons.info),
             title: Text('About'),
             onTap: (){
-
+              //Drawer 를 닫는다..
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.about);
             },
           ),
         ],
