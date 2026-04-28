@@ -40,6 +40,7 @@ dependencies:
   # 플랫폼에 맞는 파일 경로를 만드는 패키지..
   path: ^1.9.1
   http: ^1.6.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
