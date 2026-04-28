@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pjt/routes/app_routes.dart';
 import '../../models/trip_destination.dart';
 import 'home_grid_item_widget.dart';
 
@@ -21,7 +22,9 @@ class HomeGridWidget extends StatelessWidget {
       itemBuilder: (context, index){ //항목 구성을 위해 자동 호출..
         final destination = destinations[index]; //항목 데이터..
         return GestureDetector(
-          onTap: (){ },
+          onTap: (){
+            Navigator.pushNamed(context, AppRoutes.detail, arguments: destination);
+          },
           child: HomeGridItem(destination: destination),
         );
       },

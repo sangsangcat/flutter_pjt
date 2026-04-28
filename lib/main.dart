@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pjt/models/trip_destination.dart';
 import 'package:flutter_pjt/providers/trip_provider.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/screens/about_screen.dart';
+import 'package:flutter_pjt/screens/detail_screen.dart';
 import 'package:flutter_pjt/screens/myinfo_screen.dart';
 import 'package:provider/provider.dart';
 import './routes/app_routes.dart';
@@ -24,7 +26,9 @@ class TripApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => TripProvider()),
         //초기 데이터 로딩하기 위해서 loadUserData() 함수 호출해야 한다..
-        ChangeNotifierProvider(create: (_) => UserProvider()..loadUserData()),
+        ChangeNotifierProvider(create: (_) =>
+        UserProvider()
+          ..loadUserData()),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -36,6 +40,17 @@ class TripApp extends StatelessWidget {
           AppRoutes.home: (context) => HomeScreen(),
           AppRoutes.about: (context) => AboutScreen(),
           AppRoutes.myInfo: (context) => MyinfoScreen(),
+        },
+        onGenerateRoute: (settings) {
+          //어디선가 routing 명령 내려졌을때..코드 진행..
+          if (settings.name == AppRoutes.detail) {
+            //요청시 추가된 전달 데이터 획득..
+            final destination = settings.arguments as TripDestination;
+            return MaterialPageRoute(
+                builder: (context) => DetailScreen(destination),
+            );
+          }
+          return null;
         },
       ),
     );
