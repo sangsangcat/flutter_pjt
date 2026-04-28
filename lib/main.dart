@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/trip_provider.dart';
+import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/screens/about_screen.dart';
 import 'package:flutter_pjt/screens/myinfo_screen.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,11 @@ class TripApp extends StatelessWidget {
   Widget build(BuildContext context) {
     //테마설정 + 라우팅 등록 + 앱 전역 상태 등록
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => TripProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => TripProvider()),
+        //초기 데이터 로딩하기 위해서 loadUserData() 함수 호출해야 한다..
+        ChangeNotifierProvider(create: (_) => UserProvider()..loadUserData()),
+      ],
       child: MaterialApp(
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
