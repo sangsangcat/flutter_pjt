@@ -42,8 +42,8 @@ class ProductListWidget extends StatelessWidget {
             //ListView 는 자체 스크롤을 지원한다.. 하지마라..
             //화면 전체 스크롤에 따라라..
             physics: NeverScrollableScrollPhysics(),
-            itemCount: 5,
-            itemBuilder: (context, index){
+            itemCount: destination.products.length, // 상품의 사이즈에 맞게 동적 설정
+            itemBuilder: (context, index) {
               return Card(
                 margin: EdgeInsets.only(bottom: 12),
                 child: ProductItemWidget(index, destination),
