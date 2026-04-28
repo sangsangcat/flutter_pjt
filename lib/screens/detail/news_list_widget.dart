@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 import 'news_item_widget.dart';
 
 class NewsListWidget extends StatelessWidget {
+  final String country; // 국가명 추가
+
+  NewsListWidget(this.country);
+
   @override
   Widget build(BuildContext context) {
     //앱의 상태로 화면 구성..
@@ -26,7 +30,7 @@ class NewsListWidget extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => newsProvider.fetchNews(),
+                  onPressed: () => newsProvider.fetchNews(country),
                   child: Text('다시시도'),
                 ),
               ],
