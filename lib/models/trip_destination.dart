@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 class TripDestination {
   final int id;
   final String name;
   final String country;
-  final String continent; // 추가된 대륙 정보
+  final String continent;
   final String description;
   final String imagePath;
   final String discount;
@@ -14,7 +16,7 @@ class TripDestination {
     required this.id,
     required this.name,
     required this.country,
-    required this.continent, // 추가된 대륙 정보
+    required this.continent,
     required this.description,
     required this.imagePath,
     required this.discount,
@@ -29,13 +31,39 @@ class TripDestination {
       continent: json['continent'] ?? 'Unknown',
       // JSON에서 대륙 정보 추출
       description: json['description'],
-      // 서버에서 보낸 imageUrl을 사용하되, 에뮬레이터 환경이면 localhost를 10.0.2.2로 치환
-      imagePath: json['imageUrl'].toString().replaceAll(
-        'localhost',
-        '10.0.2.2',
-      ),
+      imagePath: json['imageUrl'].toString().replaceAll('localhost', '10.0.2.2'),
       discount: json['discount'],
       products: (json['products'] as List)
+          .map((p) => TravelProduct.fromJson(p))
+          .toList(),
+    );
+  }
+
+  // 로컬 DB(SQLite) 저장을 위한 Map 변환
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'country': country,
+      'continent': continent,
+      'description': description,
+      'imagePath': imagePath,
+      'discount': discount,
+      'products': jsonEncode(products.map((p) => p.toJson()).toList()), // 리스트를 JSON 문자열로 변환
+    };
+  }
+
+  // 로컬 DB(SQLite) 데이터를 객체로 변환
+  factory TripDestination.fromDbMap(Map<String, dynamic> map) {
+    return TripDestination(
+      id: map['id'],
+      name: map['name'],
+      country: map['country'],
+      continent: map['continent'],
+      description: map['description'],
+      imagePath: map['imagePath'],
+      discount: map['discount'],
+      products: (jsonDecode(map['products']) as List)
           .map((p) => TravelProduct.fromJson(p))
           .toList(),
     );
@@ -71,5 +99,18 @@ class TravelProduct {
       hotel: json['hotel'],
       schedules: List<String>.from(json['schedules']),
     );
+  }
+
+  // JSON 인코딩을 위한 메서드 추가
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'date': date,
+      'duration': duration,
+      'price': price,
+      'airline': airline,
+      'hotel': hotel,
+      'schedules': schedules,
+    };
   }
 }

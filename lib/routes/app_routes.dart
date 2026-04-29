@@ -4,4 +4,6 @@ class AppRoutes {
   static const String about = "/about";
   static const String myInfo = "/my-info";
   static const String detail = "/detail";
+  static const String login = "/login";
+  static const String signup = "/signup";
 }

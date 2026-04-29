@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_pjt/models/user_info.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
+import 'package:flutter_pjt/routes/app_routes.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class MyinfoFormWidget extends StatefulWidget {
+  const MyinfoFormWidget({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return MyinfoFormWidgetState();
@@ -13,52 +15,45 @@ class MyinfoFormWidget extends StatefulWidget {
 }
 
 class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
-  //Form 을 이용한다고 하더라도..
-  //유저 입력값 획득에서는 controller 가 필요 없지만..
-  //화면이 나올때.. 이전 입력값이 미리 화면에 출력되게 하려면 controller 있어야 한다..
   final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  String? profileImagePath; //프사 경로..
+  final passwordController = TextEditingController(); // 탈퇴 재인증용
+  String? _tempLocalPath; 
+  bool _isSaving = false; 
   ImagePicker picker = ImagePicker();
 
-  //이 위젯이 출력되면서 이전 저장 데이터가 있다면 화면에 출력되어야 한다..
-  //데이터는 provider 에서 획득하면 된다..
   @override
   void initState() {
     super.initState();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if(userProvider.userInfo != null){
-      //provider 데이터가 TextField 에 찍혀야 한다..
-      //TextField 에 연결한 controller 에 값을 지정하면 된다..
+    if (userProvider.userInfo != null) {
+      // 초기화 시 현재 서버에 저장된 이름을 불러옴
       nameController.text = userProvider.userInfo!.name ?? '';
-      emailController.text = userProvider.userInfo!.email ?? '';
-      profileImagePath = userProvider.userInfo!.profileImagePath;
     }
   }
 
+  // 이미지 선택 다이얼로그
   void showImagePickerDialog() {
-    //dialog 띄우기..
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('프로필 사진 선택'),
+          title: const Text('프로필 사진 선택'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.camera),
-                title: Text('카메라로 촬영'),
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('카메라로 촬영'),
                 onTap: () {
-                  Navigator.pop(context); //dialog 닫기..
+                  Navigator.pop(context);
                   pickImage(ImageSource.camera);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.camera),
-                title: Text('갤러리에서 선택'),
+                leading: const Icon(Icons.photo_library),
+                title: const Text('갤러리에서 선택'),
                 onTap: () {
-                  Navigator.pop(context); //dialog 닫기..
+                  Navigator.pop(context);
                   pickImage(ImageSource.gallery);
                 },
               ),
@@ -69,124 +64,224 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
     );
   }
 
+  // 이미지를 선택만 하고 실제 업로드는 saveUserInfo에서 수행함
   Future<void> pickImage(ImageSource source) async {
     try {
       final XFile? image = await picker.pickImage(source: source);
       if (image != null) {
-        //화면 업데이트..
         setState(() {
-          profileImagePath = image.path;
+          _tempLocalPath = image.path; // 화면에 즉시 반영 (임시 상태)
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('이미지 선택 중 오류가 발생했습니다.')));
-      print(e);
+      debugPrint("Image Pick Error: $e");
     }
   }
 
+  // [핵심 변경] 이름 정보와 프로필 이미지를 한꺼번에 서버에 저장
   void saveUserInfo() async {
-    //유저 입력 데이터 획득..
-    if (nameController.text.trim().isEmpty ||
-        emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('이름 또는 이메일을 입력해 주세요.')));
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final String newName = nameController.text.trim();
+
+    if (newName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('이름을 입력해 주세요.')));
       return;
     }
 
-    //유저 입력 데이터 획득..
-    final userInfo = UserInfo(
-      name: nameController.text.trim().isEmpty ? null : nameController.text.trim(),
-      email: emailController.text.trim().isEmpty ? null : emailController.text.trim(),
-      profileImagePath: profileImagePath
-    );
+    setState(() => _isSaving = true);
 
     try {
-      await Provider.of<UserProvider>(context, listen: false).updateUserInfo(userInfo);
+      // 1. 이미지가 변경되었다면 서버(Storage)에 업로드
+      if (_tempLocalPath != null) {
+        await userProvider.updateProfileImage(_tempLocalPath!);
+      }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('사용자 정보가 저장되었습니다.')));
+      // 2. 이름 정보 업데이트
+      await userProvider.updateDisplayName(newName);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('변경 사항이 성공적으로 저장되었습니다.')),
+        );
+        setState(() {
+          _isSaving = false;
+          _tempLocalPath = null; // 저장 완료 후 임시 상태 초기화
+        });
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('저장 중 오류가 발생했습니다.')));
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('저장 중 오류가 발생했습니다.')),
+        );
+      }
     }
+  }
+
+  // [핵심 추가] 회원 탈퇴를 위한 재인증 다이얼로그 (비밀번호 입력)
+  void showDeleteAccountDialog() {
+    final userProvider = context.read<UserProvider>();
+    final isGoogleUser = userProvider.isGoogleUser;
+    
+    passwordController.clear();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('회원 탈퇴'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('정말로 탈퇴하시겠습니까? 모든 정보가 삭제됩니다.'),
+            if (!isGoogleUser) ...[
+              const SizedBox(height: 16),
+              const Text('본인 확인을 위해 비밀번호를 입력해 주세요.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: '비밀번호'),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(
+            onPressed: () async {
+              try {
+                final userProvider = context.read<UserProvider>();
+                // 재인증 및 탈퇴 로직 호출
+                await userProvider.reauthenticateAndDelete(
+                  isGoogleUser ? null : passwordController.text.trim()
+                );
+                if (mounted) {
+                  Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('탈퇴 처리에 실패했습니다.')));
+                }
+              }
+            },
+            child: const Text('탈퇴', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   void dispose() {
-    super.dispose();
     nameController.dispose();
-    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Center(
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 60,
-                  //profileImagePath 값이 있는지에 따라...
-                  backgroundImage: profileImagePath != null
-                      ? FileImage(File(profileImagePath!))
-                      : AssetImage('assets/images/user_basic.jpg')
-                            as ImageProvider,
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final userInfo = userProvider.userInfo;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // 1. 프로필 이미지 섹션
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 65,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: _tempLocalPath != null
+                          ? FileImage(File(_tempLocalPath!)) as ImageProvider
+                          : (userInfo?.profileImagePath != null
+                              ? NetworkImage(userInfo!.profileImagePath!)
+                              : const AssetImage('assets/images/user_basic.jpg') as ImageProvider),
+                      child: _isSaving ? const CircularProgressIndicator(color: Colors.white) : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.blue,
+                        radius: 20,
+                        child: IconButton(
+                          onPressed: _isSaving ? null : showImagePickerDialog,
+                          icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: FloatingActionButton(
-                    onPressed: showImagePickerDialog,
-                    child: Icon(Icons.camera_alt),
-                    mini: true,
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: '이름',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isSaving ? null : saveUserInfo,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text(_isSaving ? '저장 중...' : '정보 저장'),
+                ),
+              ),
+              const SizedBox(height: 48),
+              const Divider(),
+              const SizedBox(height: 24),
+
+              // 로그아웃 버튼
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    await userProvider.signOut();
+                    if (mounted) {
+                      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+                    }
+                  },
+                  icon: const Icon(Icons.logout),
+                  label: const Text('로그아웃'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey[700],
+                    side: BorderSide(color: Colors.grey[400]!),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
-              ],
-            ),
-          ),
-          SizedBox(height: 32),
-          TextField(
-            controller: nameController,
-            decoration: InputDecoration(
-              labelText: '이름',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.person),
-            ),
-          ),
-          SizedBox(height: 16),
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              labelText: '이메일',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.email),
-            ),
-            keyboardType: TextInputType.emailAddress,
-          ),
-          SizedBox(height: 32),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: saveUserInfo,
-              child: Text('저장'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16),
               ),
-            ),
+              const SizedBox(height: 12),
+
+              // 회원 탈퇴 버튼
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: showDeleteAccountDialog, // 재인증 다이얼로그 호출
+                  icon: const Icon(Icons.person_remove),
+                  label: const Text('회원 탈퇴'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey[700],
+                    side: BorderSide(color: Colors.grey[400]!),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

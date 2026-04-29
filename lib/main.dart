@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_pjt/firebase_options.dart'; // flutterfire configure 실행 후 생성됨
 import 'package:flutter_pjt/models/trip_destination.dart';
 import 'package:flutter_pjt/providers/news_provider.dart';
 import 'package:flutter_pjt/providers/trip_provider.dart';
@@ -6,18 +8,26 @@ import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/screens/about_screen.dart';
 import 'package:flutter_pjt/screens/detail_screen.dart';
 import 'package:flutter_pjt/screens/myinfo_screen.dart';
+import 'package:flutter_pjt/screens/login_screen.dart';
+import 'package:flutter_pjt/screens/signup_screen.dart';
 import 'package:provider/provider.dart';
 import './routes/app_routes.dart';
 import './screens/home_screen.dart';
 
-void main() {
-  //constant constructor, const 예약어로 생성, 필수는 아니지만 위젯에서 권장사항..
-  //동일 매개변수로 객체 재사용.. 위젯은 불변이기 때문에..
+void main() async {
+  // [핵심 추가] 비동기 초기화를 위해 바인딩 확인 및 Firebase 초기화
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // 주의: flutterfire configure를 먼저 실행해야 FirebaseOptions.currentPlatform을 사용할 수 있습니다.
+  // 아직 실행 전이라면 아래 코드를 주석 처리하고 먼저 설정을 완료하세요.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const TripApp());
 }
 
 class TripApp extends StatelessWidget {
-  //모든 위젯은 키를 가질 수 있다..
   const TripApp({super.key});
 
   @override
@@ -28,7 +38,6 @@ class TripApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => TripProvider()..loadDestinations(),
         ),
-        //초기 데이터 로딩하기 위해서 loadUserData() 함수 호출해야 한다..
         ChangeNotifierProvider(create: (_) => UserProvider()..loadUserData()),
         ChangeNotifierProvider(create: (_) => NewsProvider()),
       ],
@@ -39,9 +48,11 @@ class TripApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: AppRoutes.home,
         routes: {
-          AppRoutes.home: (context) => HomeScreen(),
+          AppRoutes.home: (context) => const HomeScreen(),
           AppRoutes.about: (context) => AboutScreen(),
           AppRoutes.myInfo: (context) => MyinfoScreen(),
+          AppRoutes.login: (context) => const LoginScreen(),
+          AppRoutes.signup: (context) => const SignupScreen(),
         },
         onGenerateRoute: (settings) {
           //어디선가 routing 명령 내려졌을때..코드 진행..

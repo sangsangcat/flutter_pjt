@@ -1,58 +1,77 @@
-//dbms 처리 코드 추상화..
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../models/user_info.dart';
+import '../models/trip_destination.dart';
 
 class DatabaseHelper {
-  //생성자..내부에서만 객체 생성이 가능하다.. singleton 으로 유치하고 싶어서..
+  // 싱글톤 패턴 유지
   DatabaseHelper._init();
-
   static final DatabaseHelper instance = DatabaseHelper._init();
 
-  //데이터베이스 초기화..한번만 하면 된다..
-  //Database 객체의 함수를 이용해서 insert/update/delete/query 를 하는데..
-  //외부에서 직접 Database 객체를 사용하는 것이 아니라.. 이 Helper 클래스의 함수를 호출해서..
   static Database? _database;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('user_info.db');
+    _database = await _initDB('trip_cache.db'); // DB 파일명 변경
     return _database!;
   }
 
   Future<Database> _initDB(String filePath) async {
-    //각 플랫폼에 맞는 db file 저장 디렉토리 경로 획득..
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    // 버전을 2로 올려서 새로운 스키마 적용 (기존 user_info 제거 대응)
+    return await openDatabase(path, version: 2, onCreate: _createDB, onUpgrade: _onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
-    //테이블 create...
-    db.execute('''
-      CREATE TABLE user_info (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT,
-      email TEXT,
-      profileImagePath TEXT
+    // 여행 상품 정보를 캐싱하기 위한 테이블 생성
+    await db.execute('''
+      CREATE TABLE trip_destinations (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        country TEXT,
+        continent TEXT,
+        description TEXT,
+        imagePath TEXT,
+        discount TEXT,
+        products TEXT
       )
     ''');
   }
 
-  //위젯에서 DBMS 작업을 위해서 호출할 함수들...
-  Future<void> insertOrUpdateUser(UserInfo userInfo) async {
-    final db = await instance.database;
-
-    await db.delete('user_info'); //테이블 데이터 삭제,,
-    await db.insert('user_info', userInfo.toMap()); //새로운 데이터 저장..
+  // 데이터베이스 구조 변경 대응
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('DROP TABLE IF EXISTS user_info');
+      await _createDB(db, newVersion);
+    }
   }
 
-  //db 저장 데이터 획득을 위해 호출..
-  Future<UserInfo?> getUser() async {
+  // --- 여행지 캐시 관련 함수 ---
+
+  // 모든 여행지 캐시 저장
+  Future<void> saveDestinations(List<TripDestination> destinations) async {
     final db = await instance.database;
-    final maps = await db.query('user_info');
+    await db.transaction((txn) async {
+      await txn.delete('trip_destinations'); // 이전 캐시 삭제
+      for (var destination in destinations) {
+        await txn.insert('trip_destinations', destination.toMap());
+      }
+    });
+  }
+
+  // 캐시된 여행지 목록 가져오기
+  Future<List<TripDestination>> getCachedDestinations() async {
+    final db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query('trip_destinations');
+    return maps.map((map) => TripDestination.fromDbMap(map)).toList();
+  }
+
+  // 특정 여행지 정보만 가져오기 (상세보기 캐시 활용 가능)
+  Future<TripDestination?> getCachedDestination(int id) async {
+    final db = await instance.database;
+    final maps = await db.query('trip_destinations', where: 'id = ?', whereArgs: [id]);
     if (maps.isNotEmpty) {
-      return UserInfo.fromMap(maps.first);
+      return TripDestination.fromDbMap(maps.first);
     }
     return null;
   }
