@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // [추가]
 import '../providers/booking_provider.dart';
 import '../providers/user_provider.dart';
-import '../providers/trip_provider.dart'; // 추가됨
+import '../providers/trip_provider.dart';
 import '../services/firestore_service.dart';
-import 'detail/product_detail_dialog.dart'; // 추가됨
+import 'detail/product_detail_dialog.dart';
 import 'package:intl/intl.dart';
 
 class BookingScreen extends StatelessWidget {
@@ -65,18 +66,31 @@ class BookingScreen extends StatelessWidget {
                           );
                         }
                       },
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)), // 카드 상단 라운드 유지
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              booking.destinationImagePath,
+                            // [수정] Image.network를 CachedNetworkImage로 교체
+                            child: CachedNetworkImage(
+                              imageUrl: booking.destinationImagePath,
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                width: 60,
+                                height: 60,
+                                color: Colors.grey[200],
+                                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                width: 60,
+                                height: 60,
+                                color: Colors.grey[200],
+                                child: const Icon(Icons.error),
+                              ),
                             ),
                           ),
                           title: Text(
@@ -94,8 +108,7 @@ class BookingScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Divider(height: 1), // 구분선 추가
-                    // [수정] 하단 버튼 영역은 InkWell 외부에 배치
+                    const Divider(height: 1),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                       child: Row(

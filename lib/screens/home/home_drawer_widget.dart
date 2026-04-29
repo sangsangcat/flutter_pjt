@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/providers/wishlist_provider.dart';
 import 'package:flutter_pjt/providers/booking_provider.dart';
@@ -37,26 +36,19 @@ class HomeDrawerWidget extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              // [수정] 분기 로직 제거 및 캐싱 적용
                               CircleAvatar(
                                 radius: 35,
-                                // [핵심 변경] 프로필 이미지가 URL(구글)인지 파일 경로(로컬)인지 판단하여 처리
+                                backgroundColor: Colors.white,
                                 backgroundImage:
                                     userInfo?.profileImagePath != null
-                                    ? (userInfo!.profileImagePath!.startsWith(
-                                            'http',
-                                          )
-                                          ? NetworkImage(
-                                              userInfo.profileImagePath!,
-                                            )
-                                          : FileImage(
-                                                  File(
-                                                    userInfo.profileImagePath!,
-                                                  ),
-                                                )
-                                                as ImageProvider)
+                                    ? CachedNetworkImageProvider(
+                                        userInfo!.profileImagePath!,
+                                      )
                                     : const AssetImage(
-                                        'assets/images/user_basic.jpg',
-                                      ),
+                                            'assets/images/user_basic.jpg',
+                                          )
+                                          as ImageProvider,
                               ),
                               const SizedBox(height: 12),
                               ElevatedButton.icon(
@@ -172,10 +164,7 @@ class HomeDrawerWidget extends StatelessWidget {
                 title: const Text('관심상품'),
                 onTap: () {
                   Navigator.pop(context); // Drawer 닫기
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.wishlist,
-                  ); // 관심상품 화면으로 이동
+                  Navigator.pushNamed(context, AppRoutes.wishlist);
                 },
               );
             },
@@ -191,11 +180,8 @@ class HomeDrawerWidget extends StatelessWidget {
                 ),
                 title: const Text('예약 목록'),
                 onTap: () {
-                  Navigator.pop(context); // Drawer 닫기
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.booking,
-                  ); // 예약 목록 화면으로 이동
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, AppRoutes.booking);
                 },
               );
             },

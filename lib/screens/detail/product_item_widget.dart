@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // [추가] 이미지 캐싱
 import '../../models/trip_destination.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../providers/user_provider.dart';
@@ -25,7 +26,8 @@ class ProductItemWidget extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           image: DecorationImage(
-            image: NetworkImage(destination.imagePath),
+            // [수정] NetworkImage 대신 CachedNetworkImageProvider 사용
+            image: CachedNetworkImageProvider(destination.imagePath),
             fit: BoxFit.cover,
           ),
         ),
@@ -45,7 +47,8 @@ class ProductItemWidget extends StatelessWidget {
                     isWished ? Icons.favorite : Icons.favorite_border,
                     color: isWished ? Colors.red : Colors.grey,
                   ),
-                  onPressed: () => _handleWishlistToggle(context, wishlist, product),
+                  onPressed: () =>
+                      _handleWishlistToggle(context, wishlist, product),
                 );
               },
             ),
@@ -69,12 +72,16 @@ class ProductItemWidget extends StatelessWidget {
   }
 
   /// 찜하기 토글 및 로그인 상태 확인
-  void _handleWishlistToggle(BuildContext context, WishlistProvider wishlist, TravelProduct product) {
+  void _handleWishlistToggle(
+    BuildContext context,
+    WishlistProvider wishlist,
+    TravelProduct product,
+  ) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     if (!userProvider.hasUserInfo) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인이 필요한 서비스입니다.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
       return;
     }
     wishlist.toggleWish(destination.id, product);

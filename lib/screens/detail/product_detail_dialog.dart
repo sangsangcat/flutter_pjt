@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // [추가]
 import '../../models/trip_destination.dart';
 import '../../models/booking.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/user_provider.dart';
-import '../../providers/wishlist_provider.dart'; // 추가
+import '../../providers/wishlist_provider.dart';
 
 class ProductDetailDialog extends StatelessWidget {
   final TripDestination destination; // 추가: 여행지 전체 정보 (예약 시 필요)
@@ -48,19 +49,22 @@ class ProductDetailDialog extends StatelessWidget {
               ],
             ),
           ),
-          // 메인 이미지
-          Image.network(
-            imagePath,
+          // 메인 이미지 - [수정] CachedNetworkImage 적용
+          CachedNetworkImage(
+            imageUrl: imagePath,
             width: double.infinity,
             height: 200,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 200,
-                color: Colors.grey[200],
-                child: const Icon(Icons.error, color: Colors.red),
-              );
-            },
+            placeholder: (context, url) => Container(
+              height: 200,
+              color: Colors.grey[200],
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+            errorWidget: (context, url, error) => Container(
+              height: 200,
+              color: Colors.grey[200],
+              child: const Icon(Icons.error, color: Colors.red),
+            ),
           ),
           // 상세 정보 영역 (스크롤 가능)
           Flexible(
@@ -103,7 +107,7 @@ class ProductDetailDialog extends StatelessWidget {
               ),
             ),
           ),
-          // [수정] 하단 버튼 영역: 찜하기 & 예약하기
+          // 하단 버튼 영역: 찜하기 & 예약하기
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(

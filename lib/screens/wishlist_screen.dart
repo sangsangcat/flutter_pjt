@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // [추가]
 import '../providers/wishlist_provider.dart';
 import '../providers/trip_provider.dart';
-import 'detail/product_detail_dialog.dart'; // 추가
+import 'detail/product_detail_dialog.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
@@ -54,11 +55,26 @@ class WishlistScreen extends StatelessWidget {
                 child: ListTile(
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      destination.imagePath,
+                    // [수정] Image.network를 CachedNetworkImage로 교체
+                    child: CachedNetworkImage(
+                      imageUrl: destination.imagePath,
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        width: 60,
+                        height: 60,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 60,
+                        height: 60,
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.error),
+                      ),
                     ),
                   ),
                   title: Text(product.title),

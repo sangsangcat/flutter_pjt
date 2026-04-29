@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/news_article.dart';
 
 class NewsItemWidget extends StatelessWidget {
   final NewsArticle article;
 
-  NewsItemWidget(this.article);
+  const NewsItemWidget(this.article, {super.key});
 
   Future<void> _launchUrl() async {
     final Uri url = Uri.parse(article.url);
@@ -26,7 +27,8 @@ class NewsItemWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: NetworkImage(article.urlToImage!),
+                  // [수정] NetworkImage를 CachedNetworkImageProvider로 교체
+                  image: CachedNetworkImageProvider(article.urlToImage!),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -48,10 +50,10 @@ class NewsItemWidget extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             article.source ?? '',
-            style: TextStyle(fontSize: 12, color: Colors.blue),
+            style: const TextStyle(fontSize: 12, color: Colors.blue),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
 import 'package:image_picker/image_picker.dart';
@@ -78,7 +79,7 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
     }
   }
 
-  // [핵심 변경] 이름 정보와 프로필 이미지를 한꺼번에 서버에 저장
+  // 이름 정보와 프로필 이미지를 한꺼번에 서버에 저장
   void saveUserInfo() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final String newName = nameController.text.trim();
@@ -118,7 +119,7 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
     }
   }
 
-  // [핵심 추가] 회원 탈퇴를 위한 재인증 다이얼로그 (비밀번호 입력)
+  // 회원 탈퇴를 위한 재인증 다이얼로그 (비밀번호 입력)
   void showDeleteAccountDialog() {
     final userProvider = context.read<UserProvider>();
     final isGoogleUser = userProvider.isGoogleUser;
@@ -195,10 +196,11 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                     CircleAvatar(
                       radius: 65,
                       backgroundColor: Colors.grey[200],
+                      // [수정] 분기를 제거하고 CachedNetworkImageProvider 적용. 편집 중인 임시 파일만 FileImage 사용.
                       backgroundImage: _tempLocalPath != null
                           ? FileImage(File(_tempLocalPath!)) as ImageProvider
                           : (userInfo?.profileImagePath != null
-                              ? NetworkImage(userInfo!.profileImagePath!)
+                              ? CachedNetworkImageProvider(userInfo!.profileImagePath!)
                               : const AssetImage('assets/images/user_basic.jpg') as ImageProvider),
                       child: _isSaving ? const CircularProgressIndicator(color: Colors.white) : null,
                     ),
