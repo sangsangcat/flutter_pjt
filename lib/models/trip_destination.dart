@@ -2,6 +2,7 @@ class TripDestination {
   final int id;
   final String name;
   final String country;
+  final String continent; // 추가된 대륙 정보
   final String description;
   final String imagePath;
   final String discount;
@@ -13,6 +14,7 @@ class TripDestination {
     required this.id,
     required this.name,
     required this.country,
+    required this.continent, // 추가된 대륙 정보
     required this.description,
     required this.imagePath,
     required this.discount,
@@ -24,6 +26,8 @@ class TripDestination {
       id: json['id'],
       name: json['name'],
       country: json['country'],
+      continent: json['continent'] ?? 'Unknown',
+      // JSON에서 대륙 정보 추출
       description: json['description'],
       // 서버에서 보낸 imageUrl을 사용하되, 에뮬레이터 환경이면 localhost를 10.0.2.2로 치환
       imagePath: json['imageUrl'].toString().replaceAll(
