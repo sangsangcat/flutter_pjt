@@ -6,6 +6,8 @@ import 'package:flutter_pjt/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
 class HomeDrawerWidget extends StatelessWidget {
+  const HomeDrawerWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -25,16 +27,17 @@ class HomeDrawerWidget extends StatelessWidget {
                       ? FileImage(
                           File(userProvider.userInfo!.profileImagePath!),
                         )
-                      : AssetImage('assets/images/user_basic.jpg'),
+                      : const AssetImage('assets/images/user_basic.jpg')
+                            as ImageProvider,
                 ),
-                decoration: BoxDecoration(color: Colors.blue),
+                decoration: const BoxDecoration(color: Colors.blue),
               );
             },
           ),
 
           ListTile(
-            leading: Icon(Icons.info),
-            title: Text('About'),
+            leading: const Icon(Icons.info),
+            title: const Text('About'),
             onTap: () {
               //Drawer 를 닫는다..
               Navigator.pop(context);
@@ -42,8 +45,8 @@ class HomeDrawerWidget extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.person),
-            title: Text('My Info'),
+            leading: const Icon(Icons.person),
+            title: const Text('My Info'),
             onTap: () {
               //Drawer 를 닫는다..
               Navigator.pop(context);
