@@ -67,11 +67,18 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 
-	<!-- url_launcher: 외부 브라우저(http/https) 호출을 위한 스킴 허용 설정 -->
+	<!-- url_launcher 설정 -->
 	<key>LSApplicationQueriesSchemes</key>
-    <array>
-      <string>https</string>
-      <string>http</string>
-    </array>
+	<array>
+		<string>https</string>
+		<string>http</string>
+	</array>
+
+	<!-- HTTP 통신 허용 (이미지 로드 및 API 통신용) -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

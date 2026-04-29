@@ -22,7 +22,7 @@ class ProductItemWidget extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           image: DecorationImage(
-            image: AssetImage(destination.imagePath),
+            image: NetworkImage(destination.imagePath),
             fit: BoxFit.cover,
           ),
         ),
@@ -42,9 +42,9 @@ class ProductItemWidget extends StatelessWidget {
           );
         } else {
           // 데이터가 없는 경우 안내 메시지 출력
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('상세 정보가 준비 중인 상품입니다.')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('상세 정보가 준비 중인 상품입니다.')));
         }
       },
     );

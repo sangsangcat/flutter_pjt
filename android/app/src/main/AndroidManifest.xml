@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- url_launcher: Android 11(API 30) 이상에서 외부 브라우저(http/https) 호출을 위한 권한 설정 -->
     <queries>
         <intent>
@@ -17,7 +18,8 @@
     <application
         android:label="flutter_pjt"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

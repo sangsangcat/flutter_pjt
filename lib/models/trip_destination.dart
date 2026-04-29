@@ -1,4 +1,5 @@
 class TripDestination {
+  final int id;
   final String name;
   final String country;
   final String description;
@@ -9,6 +10,7 @@ class TripDestination {
   final List<TravelProduct> products;
 
   const TripDestination({
+    required this.id,
     required this.name,
     required this.country,
     required this.description,
@@ -16,6 +18,24 @@ class TripDestination {
     required this.discount,
     this.products = const [],
   });
+
+  factory TripDestination.fromJson(Map<String, dynamic> json) {
+    return TripDestination(
+      id: json['id'],
+      name: json['name'],
+      country: json['country'],
+      description: json['description'],
+      // 서버에서 보낸 imageUrl을 사용하되, 에뮬레이터 환경이면 localhost를 10.0.2.2로 치환
+      imagePath: json['imageUrl'].toString().replaceAll(
+        'localhost',
+        '10.0.2.2',
+      ),
+      discount: json['discount'],
+      products: (json['products'] as List)
+          .map((p) => TravelProduct.fromJson(p))
+          .toList(),
+    );
+  }
 }
 
 class TravelProduct {
@@ -36,4 +56,16 @@ class TravelProduct {
     required this.hotel,
     required this.schedules,
   });
+
+  factory TravelProduct.fromJson(Map<String, dynamic> json) {
+    return TravelProduct(
+      title: json['title'],
+      date: json['date'],
+      duration: json['duration'],
+      price: json['price'],
+      airline: json['airline'],
+      hotel: json['hotel'],
+      schedules: List<String>.from(json['schedules']),
+    );
+  }
 }
