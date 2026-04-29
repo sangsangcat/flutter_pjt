@@ -27,8 +27,6 @@ class DetailScreenState extends State<DetailScreen>
 
     tabController.addListener(() {
       if (tabController.index == 1 && tabController.indexIsChanging) {
-        // NewsProvider 내부에서 중복 호출 및 국가 변경 체크를 수행하므로
-        // 여기서는 조건문 없이 호출
         Provider.of<NewsProvider>(
           context,
           listen: false,

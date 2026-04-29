@@ -18,6 +18,9 @@ class UserProvider with ChangeNotifier {
   bool get hasUserInfo => _userInfo != null;
   bool get isGoogleUser => _isGoogleUser;
 
+  // 추가: 현재 로그인된 사용자의 UID 게터
+  String? get userId => _authService.currentUser?.uid;
+
   UserProvider() {
     // 인증 상태 실시간 모니터링
     _authSubscription = _authService.authStateChanges.listen((User? user) {
