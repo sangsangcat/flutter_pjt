@@ -1,8 +1,12 @@
+// 로그인 화면: 이메일/비밀번호와 구글 로그인을 제공하는 인증 진입점.
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
 import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+
+import 'widgets/auth_footer_row.dart';
+import 'widgets/auth_header_section.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,8 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(title: const Text('로그인')),
       body: Center(
@@ -37,28 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
-                // [수정] 브랜드 컬러와 테마 스타일 적용
-                Icon(
-                  Icons.lock_person_outlined,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  '환영합니다!',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '로그인하여 더 많은 혜택을 누리세요.',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
+                const AuthHeaderSection(
+                  icon: Icons.lock_person_outlined,
+                  title: '환영합니다!',
+                  subtitle: '로그인하여 더 많은 혜택을 누리세요.',
                 ),
                 const SizedBox(height: 48),
                 TextFormField(
@@ -97,9 +81,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             _emailController.text,
                             _passwordController.text,
                           );
-                      if (success && mounted) {
+                      if (!context.mounted) return;
+                      if (success) {
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
-                      } else if (mounted) {
+                      } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.'),
@@ -118,10 +103,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     final success = await context
                         .read<UserProvider>()
                         .signInWithGoogle();
-                    if (success && mounted) {
+                    if (!context.mounted) return;
+                    if (success) {
                       // 로그인 성공 시 홈 화면으로 이동
                       Navigator.pushReplacementNamed(context, AppRoutes.home);
-                    } else if (mounted) {
+                    } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.'),
@@ -134,28 +120,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: AppTheme.subtleOutlinedButtonStyle(),
                 ),
                 const SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '계정이 없으신가요?',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          AppRoutes.signup,
-                        );
-                      },
-                      style: AppTheme.accentTextButtonStyle(),
-                      child: const Text('회원가입'),
-                    ),
-                  ],
+                AuthFooterRow(
+                  prompt: '계정이 없으신가요?',
+                  actionLabel: '회원가입',
+                  onActionTap: () {
+                    Navigator.pushReplacementNamed(context, AppRoutes.signup);
+                  },
                 ),
               ],
             ),

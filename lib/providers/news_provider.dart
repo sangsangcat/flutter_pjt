@@ -3,7 +3,7 @@ import '../models/news_article.dart';
 import '../services/news_service.dart';
 
 class NewsProvider with ChangeNotifier {
-  NewsService _newsService = NewsService();
+  final NewsService _newsService = NewsService();
   List<NewsArticle> _articles = [];
   bool _isLoading = false;
   String? _error;

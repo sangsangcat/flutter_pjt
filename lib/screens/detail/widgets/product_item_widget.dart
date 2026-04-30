@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_pjt/screens/common/app_list_card.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
-import '../../models/trip_destination.dart';
-import '../../providers/wishlist_provider.dart';
-import '../../providers/user_provider.dart';
+import '../../../models/trip_destination.dart';
+import '../../../providers/wishlist_provider.dart';
+import '../../../providers/user_provider.dart';
 import 'product_detail_dialog.dart';
 
 class ProductItemWidget extends StatelessWidget {

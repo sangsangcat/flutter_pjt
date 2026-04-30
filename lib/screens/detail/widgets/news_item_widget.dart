@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_pjt/screens/common/app_list_card.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
-import '../../models/news_article.dart';
+import '../../../models/news_article.dart';
 
 class NewsItemWidget extends StatelessWidget {
   final NewsArticle article;

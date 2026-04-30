@@ -1,22 +1,23 @@
+// 목적지 상세 화면: 추천 상품과 현지 뉴스를 탭으로 나눠 보여주는 컨테이너.
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/news_provider.dart';
-import 'package:flutter_pjt/screens/detail/news_list_widget.dart';
 import 'package:provider/provider.dart';
-import '../models/trip_destination.dart';
-import './detail/product_list_widget.dart';
+import 'package:flutter_pjt/models/trip_destination.dart';
+import 'widgets/news_list_widget.dart';
+import 'widgets/product_list_widget.dart';
 
-class DetailScreen extends StatefulWidget {
+class DestinationScreen extends StatefulWidget {
   final TripDestination destination;
 
-  const DetailScreen(this.destination, {super.key});
+  const DestinationScreen(this.destination, {super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return DetailScreenState();
+    return DestinationScreenState();
   }
 }
 
-class DetailScreenState extends State<DetailScreen>
+class DestinationScreenState extends State<DestinationScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
 

@@ -1,6 +1,7 @@
 //news 데이터 획득을 위한 네트워킹..
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_pjt/models/news_article.dart';
 import 'package:http/http.dart' as http;
 
@@ -28,7 +29,7 @@ class NewsService {
         throw Exception('error news networking...1');
       }
     } catch (e) {
-      print('error : $e');
+      debugPrint('error : $e');
       throw Exception('error news networking...2');
     }
   }

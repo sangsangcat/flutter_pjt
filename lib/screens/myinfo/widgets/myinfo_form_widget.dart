@@ -1,11 +1,12 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
 import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'delete_account_dialog.dart';
+import 'image_picker_dialog.dart';
+import 'profile_avatar_section.dart';
 
 class MyinfoFormWidget extends StatefulWidget {
   const MyinfoFormWidget({super.key});
@@ -37,32 +38,16 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
   void showImagePickerDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('프로필 사진 선택'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('카메라로 촬영'),
-                onTap: () {
-                  Navigator.pop(context);
-                  pickImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('갤러리에서 선택'),
-                onTap: () {
-                  Navigator.pop(context);
-                  pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (dialogContext) => ImagePickerDialog(
+        onCameraTap: () {
+          Navigator.pop(dialogContext);
+          pickImage(ImageSource.camera);
+        },
+        onGalleryTap: () {
+          Navigator.pop(dialogContext);
+          pickImage(ImageSource.gallery);
+        },
+      ),
     );
   }
 
@@ -126,68 +111,34 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
   void showDeleteAccountDialog() {
     final userProvider = context.read<UserProvider>();
     final isGoogleUser = userProvider.isGoogleUser;
-    final theme = Theme.of(context);
 
     passwordController.clear();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('회원 탈퇴'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('정말로 탈퇴하시겠습니까? 모든 정보가 삭제됩니다.'),
-            if (!isGoogleUser) ...[
-              const SizedBox(height: 16),
-              Text(
-                '본인 확인을 위해 비밀번호를 입력해 주세요.',
-                // 재인증 안내는 화면마다 동일한 중립 톤을 쓰도록 테마의 onSurface 변형값을 사용한다.
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.58),
-                ),
-              ),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: '비밀번호'),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () async {
-              try {
-                final userProvider = context.read<UserProvider>();
-                // 재인증 및 탈퇴 로직 호출
-                await userProvider.reauthenticateAndDelete(
-                  isGoogleUser ? null : passwordController.text.trim(),
-                );
-                if (mounted) {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    AppRoutes.home,
-                    (route) => false,
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('탈퇴 처리에 실패했습니다.')),
-                  );
-                }
-              }
-            },
-            style: AppTheme.dangerTextButtonStyle(),
-            child: const Text('탈퇴'),
-          ),
-        ],
+      builder: (dialogContext) => DeleteAccountDialog(
+        isGoogleUser: isGoogleUser,
+        passwordController: passwordController,
+        onConfirm: (password) async {
+          try {
+            final userProvider = context.read<UserProvider>();
+            // 재인증 및 탈퇴 로직 호출
+            await userProvider.reauthenticateAndDelete(password);
+            if (mounted) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.home,
+                (route) => false,
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('탈퇴 처리에 실패했습니다.')));
+            }
+          }
+        },
       ),
     );
   }
@@ -201,8 +152,6 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         final userInfo = userProvider.userInfo;
@@ -213,47 +162,11 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
           child: Column(
             children: [
               // 1. 프로필 이미지 섹션
-              Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 65,
-                      backgroundColor:
-                          theme.colorScheme.surfaceContainerHighest,
-                      // [수정] 분기를 제거하고 CachedNetworkImageProvider 적용 유지.
-                      backgroundImage: _tempLocalPath != null
-                          ? FileImage(File(_tempLocalPath!)) as ImageProvider
-                          : (avatarPath != null
-                                ? CachedNetworkImageProvider(avatarPath)
-                                : const AssetImage(
-                                        'assets/images/user_basic.jpg',
-                                      )
-                                      as ImageProvider),
-                      child: _isSaving
-                          ? CircularProgressIndicator(
-                              color: theme.colorScheme.onSurface,
-                            )
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: CircleAvatar(
-                        backgroundColor:
-                            theme.colorScheme.secondary, // [수정] 브랜드 핑크로 포인트 부여
-                        radius: 20,
-                        child: IconButton(
-                          onPressed: _isSaving ? null : showImagePickerDialog,
-                          icon: Icon(
-                            Icons.camera_alt,
-                            color: theme.colorScheme.onSecondary,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              ProfileAvatarSection(
+                tempLocalPath: _tempLocalPath,
+                avatarPath: avatarPath,
+                isSaving: _isSaving,
+                onTapCamera: showImagePickerDialog,
               ),
               const SizedBox(height: 32),
               TextField(
@@ -278,13 +191,12 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                 child: OutlinedButton.icon(
                   onPressed: () async {
                     await userProvider.signOut();
-                    if (mounted) {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.home,
-                        (route) => false,
-                      );
-                    }
+                    if (!context.mounted) return;
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      AppRoutes.home,
+                      (route) => false,
+                    );
                   },
                   icon: const Icon(Icons.logout),
                   label: const Text('로그아웃'),

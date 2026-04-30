@@ -1,11 +1,12 @@
+// 관심상품 화면: 사용자가 찜한 여행 상품을 카드 리스트로 보여주는 화면.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_pjt/screens/common/app_list_card.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
-import '../providers/wishlist_provider.dart';
-import '../providers/trip_provider.dart';
-import 'common/app_empty_state.dart';
-import 'detail/product_detail_dialog.dart';
+import 'package:flutter_pjt/providers/wishlist_provider.dart';
+import 'package:flutter_pjt/providers/trip_provider.dart';
+import 'package:flutter_pjt/screens/common/app_empty_state.dart';
+import 'package:flutter_pjt/screens/detail/widgets/product_detail_dialog.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
@@ -72,10 +73,7 @@ class WishlistScreen extends StatelessWidget {
                   ),
                 ),
                 trailing: IconButton(
-                  icon: Icon(
-                    Icons.delete_outline,
-                    color: theme.colorScheme.tertiary,
-                  ),
+                  icon: Icon(Icons.favorite, color: theme.colorScheme.tertiary),
                   onPressed: () {
                     wishlistProvider.toggleWish(destination.id, product);
                   },

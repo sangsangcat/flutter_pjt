@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
-import '../../models/trip_destination.dart';
+import '../../../models/trip_destination.dart';
 
 // 여행 상품 하나를 보여주는 아이템 위젯
 class HomeGridItem extends StatelessWidget {

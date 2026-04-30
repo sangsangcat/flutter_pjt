@@ -1,5 +1,8 @@
+// 홈 검색 AppBar: 검색 모드 전환과 검색 기록 제안을 담당하는 상단 바.
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'search_history_panel.dart';
+import 'search_input_field.dart';
 
 class HomeSearchAppBar extends StatefulWidget implements PreferredSizeWidget {
   const HomeSearchAppBar({super.key});
@@ -93,77 +96,17 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
               },
               fieldViewBuilder:
                   (context, controller, focusNode, onFieldSubmitted) {
-                    return SizedBox(
-                      // AppBar 높이 안에서 검색창이 너무 커 보이지 않도록
-                      // 입력 영역 자체의 높이를 조금 낮춰 균형을 맞춘다.
-                      height: 40,
-                      child: TextField(
-                        controller: controller,
-                        focusNode: focusNode,
-                        autofocus: true,
-                        // 테마의 텍스트 스타일 적용
-                        style: theme.textTheme.bodyMedium,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: const InputDecoration(
-                          hintText: '어디로 떠나고 싶으신가요?',
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          prefixIcon: Icon(Icons.search, size: 18),
-                          prefixIconConstraints: BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
-                          ),
-                        ),
-                        onSubmitted: (value) {
-                          _onSearchSubmitted(value);
-                        },
-                      ),
+                    return SearchInputField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      onSubmitted: _onSearchSubmitted,
                     );
                   },
               optionsViewBuilder: (context, onSelected, options) {
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Material(
-                      elevation: 8.0,
-                      borderRadius: BorderRadius.circular(12),
-                      clipBehavior: Clip.antiAlias,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width - 64,
-                        color: theme.cardTheme.color,
-                        child: ListView.separated(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          itemCount: options.length,
-                          separatorBuilder: (context, index) => Divider(
-                            height: 1,
-                            color: theme.dividerColor.withValues(alpha: 0.1),
-                          ),
-                          itemBuilder: (BuildContext context, int index) {
-                            final String option = options.elementAt(index);
-                            return ListTile(
-                              leading: const Icon(Icons.history, size: 20),
-                              title: Text(
-                                option,
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                              onTap: () => onSelected(option),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.close, size: 18),
-                                onPressed: () {
-                                  _deleteSearchTerm(option);
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
+                return SearchHistoryPanel(
+                  options: options,
+                  onSelected: (selection) => _onSearchSubmitted(selection),
+                  onDelete: _deleteSearchTerm,
                 );
               },
             )
@@ -178,12 +121,6 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
           icon: Icon(_isSearching ? Icons.close : Icons.search),
           color: theme.appBarTheme.iconTheme?.color,
         ),
-        if (!_isSearching)
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none),
-            color: theme.appBarTheme.iconTheme?.color,
-          ),
       ],
     );
   }

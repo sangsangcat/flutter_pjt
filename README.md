@@ -2,7 +2,7 @@
 
 이 프로젝트는 Flutter의 핵심 기능과 다양한 외부 라이브러리를 활용해 만든 학습용 여행 정보 애플리케이션입니다. Firebase 인증, Firestore 실시간 데이터 관리, SQLite 데이터 캐싱, Provider 기반 상태 관리, 그리고 Material 3 디자인 시스템을 하나의 흐름으로 묶어두었습니다.
 
-최근에는 전역 테마와 공통 위젯을 정리해 화면마다 색상과 위계가 따로 놀지 않도록 다듬고 있습니다. 카드, 버튼, 칩, 빈 상태, 네트워크 이미지, 리스트 카드 같은 반복 UI는 공통화해서 유지보수성을 높였습니다.
+최근에는 전역 테마와 공통 위젯을 정리해 화면마다 색상과 위계가 따로 놀지 않도록 다듬고 있습니다. 카드, 버튼, 칩, 빈 상태, 네트워크 이미지, 리스트 카드 같은 반복 UI는 공통화해서 유지보수성을 높였고, 화면 파일은 각 기능 폴더 루트에 두고 세부 위젯은 `widgets/` 하위로 내려 기능 경계를 더 선명하게 정리했습니다.
 
 ## 1. 📋 기획 의도 및 주요 기능
 
@@ -23,6 +23,7 @@
 - **실시간 알림 UI**: Drawer 내 배지(Badge) 시스템을 활용한 관심상품/예약 개수 실시간 표시
 - **디자인 시스템**: `AppTheme` 중심의 색상/간격/곡률/버튼/칩/카드/다이얼로그 공통 스타일 관리
 - **공통 위젯**: `AppEmptyState`, `AppNetworkImage`, `AppListCard`로 반복 UI 패턴 통일
+- **화면 구조 정리**: `home`, `detail`, `booking`, `myinfo`, `auth`, `about`, `wishlist` 기능별 폴더에 화면과 하위 위젯을 분리
 
 ## 2. 🏛️ 시스템 아키텍처
 
@@ -43,12 +44,13 @@ lib/
 ├── services/            # 데이터 서비스 (Auth, Firestore, News, Storage, DatabaseHelper)
 ├── screens/             # UI 화면
 │   ├── common/         # 공통 위젯 (Empty State, Network Image, List Card)
-│   ├── home/           # 홈 화면 및 하부 위젯 (Drawer, Grid, Search AppBar 등)
-│   ├── detail/         # 상품 상세 정보, 상품 리스트, 뉴스 탭 위젯
-│   ├── myinfo/         # 계정 설정, 프로필 편집, 빈 상태 위젯
-│   ├── wishlist_screen.dart  # 관심 상품 목록 확인 및 삭제
-│   ├── booking_screen.dart   # 예약 내역 확인, 가상 결제 및 취소 관리
-│   └── (기타 화면들)
+│   ├── about/          # About 화면 및 전용 위젯
+│   ├── auth/           # 로그인/회원가입 화면 및 공통 위젯
+│   ├── booking/        # 예약 화면 및 전용 위젯
+│   ├── detail/         # 목적지 상세 화면 및 전용 위젯
+│   ├── home/           # 홈 화면 및 전용 위젯
+│   ├── myinfo/         # 계정 설정 화면 및 전용 위젯
+│   └── wishlist/       # 관심상품 화면
 ├── theme/              # 전역 테마 및 디자인 토큰
 ├── routes/              # Named Routes 설정
 └── main.dart            # 앱 진입점 및 전역 MultiProvider 설정
@@ -75,4 +77,5 @@ lib/
 ## 6. 📌 현재 진행 방향
 
 - Phase 5 디자인 고도화는 완료되었습니다.
-- Phase 6 디자인 시스템 정리 및 테마 재정비도 완료되었습니다.
+- Phase 6 디자인 시스템 정리 및 화면 구조 재편도 완료되었습니다.
+- 이후에는 Phase 7 큐를 새로 쌓아 다음 기능/개선 항목을 정리할 예정입니다.

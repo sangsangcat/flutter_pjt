@@ -1,8 +1,10 @@
+// 계정 설정 화면: 비로그인 안내와 프로필 수정 폼을 전환해서 보여주는 진입 화면.
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
-import 'package:flutter_pjt/screens/myinfo/myinfo_form_widget.dart';
 import 'package:provider/provider.dart';
-import 'myinfo/myinfo_empty_state_widget.dart';
+
+import 'widgets/myinfo_empty_state_widget.dart';
+import 'widgets/myinfo_form_widget.dart';
 
 class MyinfoScreen extends StatefulWidget {
   const MyinfoScreen({super.key});

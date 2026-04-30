@@ -1,8 +1,11 @@
+// 회원가입 화면: 새 계정을 생성하고 로그인 화면으로 돌아가는 인증 흐름.
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
-import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+
+import 'widgets/auth_footer_row.dart';
+import 'widgets/auth_header_section.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -29,8 +32,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(title: const Text('회원가입')),
       body: Center(
@@ -41,27 +42,10 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 10),
-                Icon(
-                  Icons.person_add_outlined,
-                  size: 70,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  '새로운 계정을 만드세요',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '여행의 시작, 저희와 함께하세요.',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
+                const AuthHeaderSection(
+                  icon: Icons.person_add_outlined,
+                  title: '새로운 계정을 만드세요',
+                  subtitle: '여행의 시작, 저희와 함께하세요.',
                 ),
                 const SizedBox(height: 40),
                 TextFormField(
@@ -135,13 +119,14 @@ class _SignupScreenState extends State<SignupScreen> {
                             _passwordController.text,
                             _nameController.text,
                           );
-                      if (success && mounted) {
+                      if (!context.mounted) return;
+                      if (success) {
                         // 가입 성공 시 안내 메시지 후 홈으로 이동
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('회원가입에 성공했습니다!')),
                         );
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
-                      } else if (mounted) {
+                      } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('회원가입에 실패했습니다. 이미 가입된 이메일인지 확인하세요.'),
@@ -153,28 +138,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: const Text('가입하기'),
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '이미 계정이 있으신가요?',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          AppRoutes.login,
-                        );
-                      },
-                      style: AppTheme.accentTextButtonStyle(),
-                      child: const Text('로그인'),
-                    ),
-                  ],
+                AuthFooterRow(
+                  prompt: '이미 계정이 있으신가요?',
+                  actionLabel: '로그인',
+                  onActionTap: () {
+                    Navigator.pushReplacementNamed(context, AppRoutes.login);
+                  },
                 ),
               ],
             ),

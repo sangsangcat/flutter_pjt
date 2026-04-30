@@ -7,25 +7,23 @@ import 'package:flutter_pjt/providers/trip_provider.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/providers/wishlist_provider.dart';
 import 'package:flutter_pjt/providers/booking_provider.dart';
-import 'package:flutter_pjt/screens/about_screen.dart';
-import 'package:flutter_pjt/screens/detail_screen.dart';
-import 'package:flutter_pjt/screens/myinfo_screen.dart';
-import 'package:flutter_pjt/screens/login_screen.dart';
-import 'package:flutter_pjt/screens/signup_screen.dart';
-import 'package:flutter_pjt/screens/wishlist_screen.dart'; // 추가
-import 'package:flutter_pjt/screens/booking_screen.dart'; // 추가
+import 'package:flutter_pjt/screens/about/about_screen.dart';
+import 'package:flutter_pjt/screens/detail/destination_screen.dart';
+import 'package:flutter_pjt/screens/myinfo/myinfo_screen.dart';
+import 'package:flutter_pjt/screens/auth/login_screen.dart';
+import 'package:flutter_pjt/screens/auth/signup_screen.dart';
+import 'package:flutter_pjt/screens/wishlist/wishlist_screen.dart';
+import 'package:flutter_pjt/screens/booking/booking_screen.dart';
 import 'package:flutter_pjt/theme/app_theme.dart'; // 테마 파일 임포트
 import 'package:provider/provider.dart';
 import './routes/app_routes.dart';
-import './screens/home_screen.dart';
+import './screens/home/home_screen.dart';
 
 void main() async {
   // 비동기 초기화를 위해 바인딩 확인 및 Firebase 초기화
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const TripApp());
 }
@@ -76,7 +74,7 @@ class TripApp extends StatelessWidget {
             // 요청시 추가된 전달 데이터 획득..
             final destination = settings.arguments as TripDestination;
             return MaterialPageRoute(
-              builder: (context) => DetailScreen(destination),
+              builder: (context) => DestinationScreen(destination),
             );
           }
           return null;

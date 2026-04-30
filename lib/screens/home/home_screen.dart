@@ -1,11 +1,13 @@
+// 홈 화면: 상단 배너, 필터, 목적지 그리드를 조립하는 메인 진입 화면.
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/trip_provider.dart';
-import 'package:flutter_pjt/screens/home/home_drawer_widget.dart';
-import 'package:flutter_pjt/screens/home/home_grid_widget.dart';
-import 'package:flutter_pjt/screens/home/home_middle_widget.dart';
-import 'package:flutter_pjt/screens/home/home_search_app_bar.dart';
-import 'package:flutter_pjt/screens/home/home_top_widget.dart';
 import 'package:provider/provider.dart';
+
+import 'widgets/home_drawer_widget.dart';
+import 'widgets/home_grid_widget.dart';
+import 'widgets/home_middle_widget.dart';
+import 'widgets/home_search_app_bar.dart';
+import 'widgets/home_top_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

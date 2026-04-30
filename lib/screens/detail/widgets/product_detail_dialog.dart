@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import 'package:flutter_pjt/theme/app_theme.dart';
-import '../../models/trip_destination.dart';
-import '../../models/booking.dart';
-import '../../providers/booking_provider.dart';
-import '../../providers/user_provider.dart';
-import '../../providers/wishlist_provider.dart';
+import '../../../models/trip_destination.dart';
+import '../../../models/booking.dart';
+import '../../../providers/booking_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../../providers/wishlist_provider.dart';
 
 class ProductDetailDialog extends StatelessWidget {
   final TripDestination destination; // 추가: 여행지 전체 정보 (예약 시 필요)

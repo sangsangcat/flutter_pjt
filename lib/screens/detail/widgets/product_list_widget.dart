@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import 'product_item_widget.dart';
-import '../../models/trip_destination.dart';
+import '../../../models/trip_destination.dart';
 
 class ProductListWidget extends StatelessWidget {
   final TripDestination destination;

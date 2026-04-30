@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
-import '../../models/trip_destination.dart';
-import '../common/app_empty_state.dart';
+import 'package:flutter_pjt/screens/common/app_empty_state.dart';
+import '../../../models/trip_destination.dart';
 import 'home_grid_item_widget.dart';
 
 class HomeGridWidget extends StatelessWidget {

@@ -1,9 +1,12 @@
+// About 화면: 세로/가로 전환에 따라 소개 콘텐츠를 분기해서 보여주는 진입 화면.
 import 'package:flutter/material.dart';
-import 'package:flutter_pjt/screens/about/about_landscape_widget.dart';
-import '../routes/app_routes.dart';
-import 'about/about_portrait_widget.dart';
+import 'package:flutter_pjt/routes/app_routes.dart';
+import 'widgets/about_landscape_widget.dart';
+import 'widgets/about_portrait_widget.dart';
 
 class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
