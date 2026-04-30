@@ -26,7 +26,7 @@ class HomeMiddleWidget extends StatelessWidget {
       children: [
         Text(
           '인기 여행지',
-          style: theme.textTheme.titleLarge, // [수정] 테마 스타일 적용
+          style: theme.textTheme.titleMedium, // [수정] 테마 스타일 적용
         ),
         const SizedBox(height: 12),
         SingleChildScrollView(
@@ -47,14 +47,13 @@ class HomeMiddleWidget extends StatelessWidget {
                     }
                   },
                   // [수정] 색상과 모양은 AppTheme.chipTheme에 맡겨 대륙 필터도 전역 테마를 따르게 함
-                  labelStyle: TextStyle(
+                  labelStyle: theme.textTheme.labelLarge?.copyWith(
                     color: isSelected
                         ? theme.colorScheme.onPrimary
                         : theme.colorScheme.onSurface,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
-                    fontSize: 13,
                   ),
                 ),
               );

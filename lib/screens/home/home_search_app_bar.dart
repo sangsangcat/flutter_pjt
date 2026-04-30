@@ -76,7 +76,7 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return AppBar(
       title: _isSearching
           ? Autocomplete<String>(
@@ -93,20 +93,34 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
               },
               fieldViewBuilder:
                   (context, controller, focusNode, onFieldSubmitted) {
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      autofocus: true,
-                      // 테마의 텍스트 스타일 적용
-                      style: theme.textTheme.bodyLarge,
-                      decoration: const InputDecoration(
-                        hintText: '어디로 떠나고 싶으신가요?',
-                        // InputDecorationTheme이 정의되어 있어 상세 설정 생략 가능
-                        prefixIcon: Icon(Icons.search, size: 20),
+                    return SizedBox(
+                      // AppBar 높이 안에서 검색창이 너무 커 보이지 않도록
+                      // 입력 영역 자체의 높이를 조금 낮춰 균형을 맞춘다.
+                      height: 40,
+                      child: TextField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        autofocus: true,
+                        // 테마의 텍스트 스타일 적용
+                        style: theme.textTheme.bodyMedium,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: const InputDecoration(
+                          hintText: '어디로 떠나고 싶으신가요?',
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          prefixIcon: Icon(Icons.search, size: 18),
+                          prefixIconConstraints: BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40,
+                          ),
+                        ),
+                        onSubmitted: (value) {
+                          _onSearchSubmitted(value);
+                        },
                       ),
-                      onSubmitted: (value) {
-                        _onSearchSubmitted(value);
-                      },
                     );
                   },
               optionsViewBuilder: (context, onSelected, options) {
@@ -133,7 +147,10 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
                             final String option = options.elementAt(index);
                             return ListTile(
                               leading: const Icon(Icons.history, size: 20),
-                              title: Text(option, style: theme.textTheme.bodyMedium),
+                              title: Text(
+                                option,
+                                style: theme.textTheme.bodyMedium,
+                              ),
                               onTap: () => onSelected(option),
                               trailing: IconButton(
                                 icon: const Icon(Icons.close, size: 18),
@@ -150,10 +167,7 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
                 );
               },
             )
-          : Text(
-              'Trip App',
-              style: theme.appBarTheme.titleTextStyle,
-            ),
+          : Text('Trip App', style: theme.appBarTheme.titleTextStyle),
       actions: [
         IconButton(
           onPressed: () {
@@ -166,7 +180,7 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
         ),
         if (!_isSearching)
           IconButton(
-            onPressed: () {}, 
+            onPressed: () {},
             icon: const Icon(Icons.notifications_none),
             color: theme.appBarTheme.iconTheme?.color,
           ),

@@ -1,23 +1,117 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // 1. 핵심 컬러 정의 (요청하신 #02343F, #F0EDCC 기반)
-  static const Color primaryColor = Color(0xFF02343F); // 딥 틸 (신뢰감)
-  static const Color secondaryColor = Color(0xFF337D71); // 중간 틸 (포인트)
-  static const Color notificationColor = Color(
-    0xFFD14D72,
-  ); // 알림 배지와 선택된 하트에 쓰는 핑크 포인트
+  // Palette
+  // 컬러 헌트 팔레트 #F6F4EB / #91C8E4 / #749BC2 / #4682A9 를
+  // 배경, 보조 브랜드, 브랜드, 강조색의 역할로 나눠 전체 UI의 톤을 맞춘다.
+  static const Color primaryColor = Color(0xFF4682A9);
+  static const Color secondaryColor = Color(0xFF749BC2);
+  static const Color notificationColor = Color(0xFFD14D72);
+  static const Color dangerColor = Color(0xFFD9534F);
+  static const Color warningColor = Color(0xFFF0B95F);
+  static const Color successColor = Color(0xFF749BC2);
 
-  // 배경 시스템: 흰색(#FFFFFF)이 너무 튀지 않도록 톤 온 톤 배색 적용
-  static const Color backgroundColor = Color(0xFFF0EDCC); // 메인 배경 (샴페인 크림)
-  static const Color cardColor = Color(0xFFF7F5E6); // 카드 배경 (배경보다 아주 살짝 밝은 크림)
-  static const Color inputFillColor = Color(
-    0xFFE5E2B3,
-  ); // 입력창 배경 (배경보다 살짝 어두운 톤)
+  // Surface tones
+  // 배경과 카드, 입력창이 서로 너무 튀지 않도록 한 단계씩만 차이를 둔다.
+  // 배경은 팔레트의 파란 계열에 맞춘 아주 옅은 블루-그레이로 두고,
+  // 카드와 입력창은 그 위에서만 살짝 밝고 선명하게 보이도록 맞춘다.
+  static const Color backgroundColor = Color(0xFFF1F6FB);
+  static const Color cardColor = Color(0xFFFAFCFE);
+  static const Color inputFillColor = Color(0xFFE5EFF7);
 
-  static const Color textPrimary = Color(0xFF02343F); // 짙은 틸 (텍스트)
-  static const Color textSecondary = Color(0xFF5E7A7D); // 차분한 틸 그레이
-  static const double commonRadius = 12.0; // 화면별 곡률이 흩어지지 않도록 공통 기준값 제공
+  // Typography and spacing tokens
+  // 화면 곳곳에서 반복되는 곡률과 간격을 한곳에 묶어 레이아웃 밀도를 통일한다.
+  static const Color textPrimary = Color(0xFF2E4B66);
+  static const Color textSecondary = Color(0xFF5D748B);
+  static const double commonRadius = 12.0;
+  static const double radiusSmall = 8.0;
+  static const double radiusMedium = commonRadius;
+  static const double radiusLarge = 16.0;
+  static const double spacingXs = 4.0;
+  static const double spacingSm = 8.0;
+  static const double spacingMd = 12.0;
+  static const double spacingLg = 16.0;
+  static const double spacingXl = 24.0;
+  static const double spacingXxl = 32.0;
+
+  // 화면별 styleFrom 중복을 줄이기 위한 버튼 helper.
+  // 버튼의 "역할"을 이름으로 남겨야 이후 테마 수정 시 같은 의도의 버튼을 한 번에 조정할 수 있다.
+  static ButtonStyle compactPrimaryButtonStyle() {
+    return ElevatedButton.styleFrom(
+      minimumSize: const Size(100, 36),
+      elevation: 3,
+      shadowColor: primaryColor.withValues(alpha: 0.20),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radiusMedium),
+      ),
+    );
+  }
+
+  static ButtonStyle subtleOutlinedButtonStyle() {
+    return OutlinedButton.styleFrom(
+      foregroundColor: textPrimary.withValues(alpha: 0.6),
+      side: BorderSide(color: textPrimary.withValues(alpha: 0.2)),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      minimumSize: const Size(0, 36),
+    );
+  }
+
+  static ButtonStyle dangerTextButtonStyle() {
+    return TextButton.styleFrom(
+      foregroundColor: dangerColor.withValues(alpha: 0.7),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+    );
+  }
+
+  static ButtonStyle accentTextButtonStyle() {
+    return TextButton.styleFrom(
+      foregroundColor: secondaryColor,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+    );
+  }
+
+  static ButtonStyle compactOutlinedButtonStyle() {
+    return OutlinedButton.styleFrom(minimumSize: const Size(0, 52));
+  }
+
+  static ButtonStyle drawerHeaderActionButtonStyle() {
+    return ElevatedButton.styleFrom(
+      // Drawer 헤더 안에서만 쓰는 예외 버튼이라, 상단 배경과 색 대비를 더 준다.
+      backgroundColor: cardColor,
+      foregroundColor: primaryColor,
+      elevation: 2,
+      shadowColor: primaryColor.withValues(alpha: 0.16),
+      minimumSize: const Size(0, 32),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radiusMedium),
+      ),
+      side: BorderSide(color: primaryColor.withValues(alpha: 0.12)),
+      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+    );
+  }
+
+  static ButtonStyle onPrimaryFilledButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: backgroundColor,
+      foregroundColor: primaryColor,
+      elevation: 3,
+      shadowColor: primaryColor.withValues(alpha: 0.18),
+      minimumSize: const Size(0, 36),
+    );
+  }
+
+  static ButtonStyle onPrimaryOutlinedButtonStyle() {
+    return OutlinedButton.styleFrom(
+      side: BorderSide(color: backgroundColor.withValues(alpha: 0.54)),
+      foregroundColor: backgroundColor,
+      backgroundColor: primaryColor.withValues(alpha: 0.10),
+      elevation: 1,
+      shadowColor: primaryColor.withValues(alpha: 0.10),
+      minimumSize: const Size(0, 36),
+    );
+  }
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -40,16 +134,18 @@ class AppTheme {
       canvasColor: backgroundColor,
       dividerColor: primaryColor.withValues(alpha: 0.12),
 
-      // 카드 테마: 흰색을 버리고 크림 톤을 유지하여 부드러운 레이어링 구현
+      // Surface themes
+      // 카드, 앱바, 입력창, 다이얼로그처럼 반복되는 Material 표면을 같은 톤으로 묶는다.
       cardTheme: CardThemeData(
         color: cardColor,
-        elevation: 0,
+        elevation: 4,
+        shadowColor: primaryColor.withValues(alpha: 0.18),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(commonRadius),
           side: BorderSide(
-            color: primaryColor.withValues(alpha: 0.08),
+            color: primaryColor.withValues(alpha: 0.1),
           ), // 미세한 테두리로 구분
         ),
       ),
@@ -66,7 +162,6 @@ class AppTheme {
         ),
       ),
 
-      // 입력창 테마: 일관된 곡률과 배경색 적용
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: inputFillColor,
@@ -89,13 +184,15 @@ class AppTheme {
         hintStyle: const TextStyle(color: textSecondary, fontSize: 14),
       ),
 
-      // 버튼 테마 통합 관리 (모양과 위계 일관성 확보)
+      // Button themes
+      // 기본 버튼 위계를 여기서 잡아두면 화면별 styleFrom 남발을 줄일 수 있다.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
           foregroundColor: backgroundColor,
           minimumSize: const Size(double.infinity, 54),
-          elevation: 2, // 버튼은 배경에서 확실히 분리되도록 그림자 부여
+          elevation: 4, // 버튼은 배경에서 확실히 분리되도록 그림자 부여
+          shadowColor: primaryColor.withValues(alpha: 0.24),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(commonRadius),
@@ -108,6 +205,9 @@ class AppTheme {
           foregroundColor: primaryColor,
           side: const BorderSide(color: primaryColor, width: 1.5),
           minimumSize: const Size(double.infinity, 54),
+          backgroundColor: cardColor,
+          elevation: 2,
+          shadowColor: primaryColor.withValues(alpha: 0.12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(commonRadius),
           ),
@@ -126,12 +226,16 @@ class AppTheme {
         ),
       ),
 
-      // 화면 곳곳의 선택 칩이 테마 변경을 자동으로 따라가도록 공통 Chip 스타일을 정의
+      // Shared components
       chipTheme: ChipThemeData(
         backgroundColor: cardColor,
         selectedColor: primaryColor,
         disabledColor: inputFillColor.withValues(alpha: 0.6),
         side: BorderSide(color: primaryColor.withValues(alpha: 0.12)),
+        elevation: 1,
+        pressElevation: 3,
+        shadowColor: primaryColor.withValues(alpha: 0.12),
+        selectedShadowColor: primaryColor.withValues(alpha: 0.18),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(commonRadius),
         ),
@@ -156,7 +260,6 @@ class AppTheme {
         labelStyle: TextStyle(fontWeight: FontWeight.bold),
       ),
 
-      // Dialog/ListTile/SnackBar처럼 화면에서 자주 쓰는 Material 위젯도 테마의 톤을 공유
       dialogTheme: DialogThemeData(
         backgroundColor: cardColor,
         surfaceTintColor: Colors.transparent,
@@ -170,10 +273,9 @@ class AppTheme {
         textColor: textPrimary,
       ),
 
-      // Drawer 배지와 선택된 하트처럼 작은 상태 표시에만 핑크 포인트를 사용
       badgeTheme: const BadgeThemeData(
         backgroundColor: notificationColor,
-        textColor: backgroundColor,
+        textColor: cardColor,
         textStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
       ),
 
@@ -196,10 +298,30 @@ class AppTheme {
           fontWeight: FontWeight.bold,
           fontSize: 26,
         ),
+        headlineSmall: TextStyle(
+          color: textPrimary,
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+        ),
         titleLarge: TextStyle(
           color: textPrimary,
           fontWeight: FontWeight.bold,
           fontSize: 18,
+        ),
+        titleMedium: TextStyle(
+          color: textPrimary,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        labelLarge: TextStyle(
+          color: textPrimary,
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        labelSmall: TextStyle(
+          color: textPrimary,
+          fontWeight: FontWeight.w700,
+          fontSize: 11,
         ),
         bodyLarge: TextStyle(color: textPrimary, fontSize: 16),
         bodyMedium: TextStyle(color: textPrimary, fontSize: 14, height: 1.5),
