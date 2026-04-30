@@ -32,7 +32,7 @@ class HomeGridWidget extends StatelessWidget {
           onTap: () {
             Navigator.pushNamed(
               context,
-              AppRoutes.detail,
+              AppRoutes.destination,
               arguments: destination,
             );
           },

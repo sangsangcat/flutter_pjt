@@ -1,6 +1,6 @@
 // 홈 검색 AppBar: 검색 모드 전환과 검색 기록 제안을 담당하는 상단 바.
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_pjt/services/search_history_service.dart';
 import 'search_history_panel.dart';
 import 'search_input_field.dart';
 
@@ -18,6 +18,7 @@ class HomeSearchAppBar extends StatefulWidget implements PreferredSizeWidget {
 class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
   bool _isSearching = false;
   List<String> _searchHistory = [];
+  final SearchHistoryService _historyService = SearchHistoryService();
 
   @override
   void initState() {
@@ -27,42 +28,32 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
 
   // shared_preferences를 사용하여 저장된 검색 기록을 불러오는 함수
   Future<void> _loadSearchHistory() async {
-    // SharedPreferences 인스턴스를 획득 (비동기 처리)
-    final prefs = await SharedPreferences.getInstance();
-    // 'search_history' 키로 저장된 문자열 리스트를 가져옴 (없으면 빈 리스트)
+    final history = await _historyService.loadHistory();
+    if (!mounted) return;
     setState(() {
-      _searchHistory = prefs.getStringList('search_history') ?? [];
+      _searchHistory = history;
     });
   }
 
   // 새로운 검색어를 shared_preferences에 저장하는 함수
   Future<void> _saveSearchTerm(String term) async {
     if (term.trim().isEmpty) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      // 중복된 검색어가 있다면 먼저 제거 (최신순 정렬을 위해)
-      _searchHistory.remove(term);
-      // 리스트의 가장 앞에 새로운 검색어 추가
-      _searchHistory.insert(0, term);
-      // 기록을 최대 10개로 제한
-      if (_searchHistory.length > 10) {
-        _searchHistory = _searchHistory.sublist(0, 10);
-      }
-    });
-    // 업데이트된 리스트를 'search_history' 키로 영구 저장
-    await prefs.setStringList('search_history', _searchHistory);
+    await _historyService.saveTerm(term);
+    await _refreshSearchHistory();
   }
 
   // 특정 검색어를 shared_preferences 기록에서 삭제하는 함수
   Future<void> _deleteSearchTerm(String term) async {
-    final prefs = await SharedPreferences.getInstance();
+    await _historyService.deleteTerm(term);
+    await _refreshSearchHistory();
+  }
+
+  Future<void> _refreshSearchHistory() async {
+    final history = await _historyService.loadHistory();
+    if (!mounted) return;
     setState(() {
-      // 메모리 상의 리스트에서 해당 검색어 제거
-      _searchHistory.remove(term);
+      _searchHistory = history;
     });
-    // 변경된 리스트를 다시 저장하여 데이터 동기화
-    await prefs.setStringList('search_history', _searchHistory);
   }
 
   void _onSearchSubmitted(String value) {

@@ -6,7 +6,7 @@ import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import 'package:flutter_pjt/providers/wishlist_provider.dart';
 import 'package:flutter_pjt/providers/trip_provider.dart';
 import 'package:flutter_pjt/screens/common/app_empty_state.dart';
-import 'package:flutter_pjt/screens/detail/widgets/product_detail_dialog.dart';
+import 'package:flutter_pjt/screens/destination/widgets/product_detail_dialog.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});

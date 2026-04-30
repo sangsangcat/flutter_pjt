@@ -38,9 +38,10 @@ class WishlistProvider with ChangeNotifier {
   }
 
   /// 상품 단위 관심상품 토글
-  Future<void> toggleWish(int destinationId, TravelProduct product) async {
-    if (_userId == null) return;
+  Future<bool> toggleWish(int destinationId, TravelProduct product) async {
+    if (_userId == null) return false;
     await _firestoreService.toggleProductWish(_userId!, destinationId, product);
+    return true;
   }
 
   @override

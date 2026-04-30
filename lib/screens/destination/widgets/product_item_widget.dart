@@ -4,7 +4,6 @@ import 'package:flutter_pjt/screens/common/app_list_card.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import '../../../models/trip_destination.dart';
 import '../../../providers/wishlist_provider.dart';
-import '../../../providers/user_provider.dart';
 import 'product_detail_dialog.dart';
 
 class ProductItemWidget extends StatelessWidget {
@@ -92,19 +91,16 @@ class ProductItemWidget extends StatelessWidget {
     );
   }
 
-  /// 찜하기 토글 및 로그인 상태 확인 로직 유지
-  void _handleWishlistToggle(
+  /// 찜하기 토글은 Provider가 처리하고, UI는 결과만 반응한다.
+  Future<void> _handleWishlistToggle(
     BuildContext context,
     WishlistProvider wishlist,
     TravelProduct product,
-  ) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (!userProvider.hasUserInfo) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
-      return;
-    }
-    wishlist.toggleWish(destination.id, product);
+  ) async {
+    final didToggle = await wishlist.toggleWish(destination.id, product);
+    if (!context.mounted || didToggle) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
   }
 }

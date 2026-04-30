@@ -1,7 +1,5 @@
 // 목적지 상세 화면: 추천 상품과 현지 뉴스를 탭으로 나눠 보여주는 컨테이너.
 import 'package:flutter/material.dart';
-import 'package:flutter_pjt/providers/news_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_pjt/models/trip_destination.dart';
 import 'widgets/news_list_widget.dart';
 import 'widgets/product_list_widget.dart';
@@ -25,16 +23,6 @@ class DestinationScreenState extends State<DestinationScreen>
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
-
-    // 탭 변경 시 뉴스 데이터를 가져오는 기존 로직 유지
-    tabController.addListener(() {
-      if (tabController.index == 1 && tabController.indexIsChanging) {
-        Provider.of<NewsProvider>(
-          context,
-          listen: false,
-        ).fetchNews(widget.destination.country);
-      }
-    });
   }
 
   @override

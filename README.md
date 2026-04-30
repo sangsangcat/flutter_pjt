@@ -2,7 +2,8 @@
 
 이 프로젝트는 Flutter의 핵심 기능과 다양한 외부 라이브러리를 활용해 만든 학습용 여행 정보 애플리케이션입니다. Firebase 인증, Firestore 실시간 데이터 관리, SQLite 데이터 캐싱, Provider 기반 상태 관리, 그리고 Material 3 디자인 시스템을 하나의 흐름으로 묶어두었습니다.
 
-최근에는 전역 테마와 공통 위젯을 정리해 화면마다 색상과 위계가 따로 놀지 않도록 다듬고 있습니다. 카드, 버튼, 칩, 빈 상태, 네트워크 이미지, 리스트 카드 같은 반복 UI는 공통화해서 유지보수성을 높였고, 화면 파일은 각 기능 폴더 루트에 두고 세부 위젯은 `widgets/` 하위로 내려 기능 경계를 더 선명하게 정리했습니다.
+최근에는 전역 테마와 공통 위젯을 정리해 화면마다 색상과 위계가 따로 놀지 않도록 다듬고 있습니다. 카드, 버튼, 칩, 빈 상태, 네트워크 이미지, 리스트 카드 같은 반복 UI는 공통화해서 유지보수성을 높였고, 화면 파일은 각 기능 폴더 루트에 두고 세부 위젯은 `widgets/` 하위로 내려 기능 경계를 더 선명하게 정리했습니다.  
+또한 `detail` 폴더와 라우트 의미를 `destination`으로 맞춰, 목적지 상세 화면이라는 역할이 코드 구조에 그대로 드러나도록 정리했습니다.
 
 ## 1. 📋 기획 의도 및 주요 기능
 
@@ -23,7 +24,7 @@
 - **실시간 알림 UI**: Drawer 내 배지(Badge) 시스템을 활용한 관심상품/예약 개수 실시간 표시
 - **디자인 시스템**: `AppTheme` 중심의 색상/간격/곡률/버튼/칩/카드/다이얼로그 공통 스타일 관리
 - **공통 위젯**: `AppEmptyState`, `AppNetworkImage`, `AppListCard`로 반복 UI 패턴 통일
-- **화면 구조 정리**: `home`, `detail`, `booking`, `myinfo`, `auth`, `about`, `wishlist` 기능별 폴더에 화면과 하위 위젯을 분리
+- **화면 구조 정리**: `home`, `destination`, `booking`, `myinfo`, `auth`, `about`, `wishlist` 기능별 폴더에 화면과 하위 위젯을 분리
 
 ## 2. 🏛️ 시스템 아키텍처
 
@@ -34,6 +35,7 @@
 - **Service Layer**: Firestore(실시간 DB), SQLite(로컬 캐시), API(네트워크 통신), Storage(파일 업로드) 등 다양한 데이터 소스를 캡슐화
 - **Design Layer**: `lib/theme/app_theme.dart`에서 전역 팔레트, spacing/radius 토큰, 버튼 스타일, 텍스트 역할, Card/Chip/Dialog/Badge 테마를 통합 관리
 - **Common Widgets**: `lib/screens/common/` 아래에 빈 상태, 네트워크 이미지, 리스트 카드 공통 위젯을 두어 반복 UI를 일관되게 유지
+- **ViewModel Boundary**: `UserProvider`, `TripProvider`, `BookingProvider`, `NewsProvider`, `WishlistProvider`를 중심으로 화면과 데이터 책임을 분리하고, 다음 단계에서는 Provider와 Service/Repository의 경계를 더 정교하게 다듬는 방향으로 확장 예정
 
 ## 3. 📂 폴더 구조
 
@@ -47,7 +49,7 @@ lib/
 │   ├── about/          # About 화면 및 전용 위젯
 │   ├── auth/           # 로그인/회원가입 화면 및 공통 위젯
 │   ├── booking/        # 예약 화면 및 전용 위젯
-│   ├── detail/         # 목적지 상세 화면 및 전용 위젯
+│   ├── destination/    # 목적지 상세 화면 및 전용 위젯
 │   ├── home/           # 홈 화면 및 전용 위젯
 │   ├── myinfo/         # 계정 설정 화면 및 전용 위젯
 │   └── wishlist/       # 관심상품 화면
@@ -78,4 +80,5 @@ lib/
 
 - Phase 5 디자인 고도화는 완료되었습니다.
 - Phase 6 디자인 시스템 정리 및 화면 구조 재편도 완료되었습니다.
-- 이후에는 Phase 7 큐를 새로 쌓아 다음 기능/개선 항목을 정리할 예정입니다.
+- Phase 7 MVVM 책임 분리 정리도 완료되었습니다.
+- 다음 단계에서는 Phase 8로 Provider와 Service/Repository의 경계를 더 정교하게 다듬는 작업을 진행할 예정입니다.

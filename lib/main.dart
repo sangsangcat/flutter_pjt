@@ -8,7 +8,7 @@ import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/providers/wishlist_provider.dart';
 import 'package:flutter_pjt/providers/booking_provider.dart';
 import 'package:flutter_pjt/screens/about/about_screen.dart';
-import 'package:flutter_pjt/screens/detail/destination_screen.dart';
+import 'package:flutter_pjt/screens/destination/destination_screen.dart';
 import 'package:flutter_pjt/screens/myinfo/myinfo_screen.dart';
 import 'package:flutter_pjt/screens/auth/login_screen.dart';
 import 'package:flutter_pjt/screens/auth/signup_screen.dart';
@@ -70,7 +70,7 @@ class TripApp extends StatelessWidget {
         },
         onGenerateRoute: (settings) {
           // 어디선가 routing 명령 내려졌을때..코드 진행..
-          if (settings.name == AppRoutes.detail) {
+          if (settings.name == AppRoutes.destination) {
             // 요청시 추가된 전달 데이터 획득..
             final destination = settings.arguments as TripDestination;
             return MaterialPageRoute(

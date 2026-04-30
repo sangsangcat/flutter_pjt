@@ -1,16 +1,14 @@
 // 예약 목록 화면: 예약 상태 확인, 취소, 결제 흐름을 관리하는 화면.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:flutter_pjt/models/booking.dart';
 import 'package:flutter_pjt/providers/booking_provider.dart';
-import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/providers/trip_provider.dart';
-import 'package:flutter_pjt/services/firestore_service.dart';
+import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:flutter_pjt/screens/common/app_empty_state.dart';
 import 'widgets/booking_list_item.dart';
 import 'widgets/booking_payment_dialog.dart';
-import 'package:flutter_pjt/screens/detail/widgets/product_detail_dialog.dart';
+import 'package:flutter_pjt/screens/destination/widgets/product_detail_dialog.dart';
 import 'package:intl/intl.dart';
 
 class BookingScreen extends StatelessWidget {
@@ -19,8 +17,6 @@ class BookingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final firestoreService = FirestoreService();
-    final userId = Provider.of<UserProvider>(context, listen: false).userId;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,18 +68,8 @@ class BookingScreen extends StatelessWidget {
                     );
                   }
                 },
-                onCancel: () => _showCancelDialog(
-                  context,
-                  firestoreService,
-                  userId!,
-                  booking.id,
-                ),
-                onPayment: () => _showPaymentDialog(
-                  context,
-                  firestoreService,
-                  userId,
-                  booking,
-                ),
+                onCancel: () => _showCancelDialog(context, booking.id),
+                onPayment: () => _showPaymentDialog(context, booking),
               );
             },
           );
@@ -92,37 +78,20 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  void _showPaymentDialog(
-    BuildContext context,
-    FirestoreService service,
-    String? uid,
-    Booking booking,
-  ) {
-    if (uid == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
-      return;
-    }
-
+  void _showPaymentDialog(BuildContext context, Booking booking) {
     showDialog(
       context: context,
       builder: (dialogContext) => BookingPaymentDialog(
         booking: booking,
         onConfirm: () {
           Navigator.pop(dialogContext);
-          _handlePayment(context, service, uid, booking.id);
+          _handlePayment(context, booking.id);
         },
       ),
     );
   }
 
-  void _showCancelDialog(
-    BuildContext context,
-    FirestoreService service,
-    String uid,
-    String bookingId,
-  ) {
+  void _showCancelDialog(BuildContext context, String bookingId) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -135,8 +104,17 @@ class BookingScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              await service.deleteBooking(uid, bookingId);
-              if (context.mounted) Navigator.pop(context);
+              final success = await context.read<BookingProvider>().cancelBooking(
+                bookingId,
+              );
+              if (!context.mounted) return;
+              if (success) {
+                Navigator.pop(context);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('로그인이 필요한 서비스입니다.')),
+                );
+              }
             },
             style: AppTheme.dangerTextButtonStyle(),
             child: const Text('예, 취소합니다'),
@@ -146,18 +124,17 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  void _handlePayment(
-    BuildContext context,
-    FirestoreService service,
-    String uid,
-    String bookingId,
-  ) async {
+  void _handlePayment(BuildContext context, String bookingId) async {
     // 가상 결제 프로세스
-    await service.updateBookingStatus(uid, bookingId, 'paid');
+    final success = await context.read<BookingProvider>().payBooking(bookingId);
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('결제가 완료되었습니다.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success ? '결제가 완료되었습니다.' : '로그인이 필요한 서비스입니다.',
+          ),
+        ),
+      );
     }
   }
 }

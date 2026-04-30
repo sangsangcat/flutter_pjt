@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import 'package:flutter_pjt/theme/app_theme.dart';
 import '../../../models/trip_destination.dart';
-import '../../../models/booking.dart';
 import '../../../providers/booking_provider.dart';
-import '../../../providers/user_provider.dart';
 import '../../../providers/wishlist_provider.dart';
 
 class ProductDetailDialog extends StatelessWidget {
@@ -179,52 +177,36 @@ class ProductDetailDialog extends StatelessWidget {
     );
   }
 
-  /// 찜하기 토글 로직 유지
-  void _handleWishlistToggle(BuildContext context, WishlistProvider wishlist) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (!userProvider.hasUserInfo) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
-      return;
-    }
-    wishlist.toggleWish(destination.id, product);
+  /// 찜하기 토글은 Provider가 처리하고, UI는 결과만 반응한다.
+  Future<void> _handleWishlistToggle(
+    BuildContext context,
+    WishlistProvider wishlist,
+  ) async {
+    final didToggle = await wishlist.toggleWish(destination.id, product);
+    if (!context.mounted || didToggle) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
   }
 
   /// 예약 처리 로직 유지
   void _handleBooking(BuildContext context) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    // 1. 로그인 여부 확인
-    if (!userProvider.hasUserInfo) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
-      return;
-    }
-
-    // 2. 예약 데이터 생성
-    final newBooking = Booking(
-      id: '',
-      destinationId: destination.id,
-      destinationName: destination.name,
-      destinationImagePath: destination.imagePath,
-      product: product,
-      status: 'pending', // 초기 상태는 대기
-      createdAt: DateTime.now(),
-    );
-
     try {
-      // 3. Provider를 통해 Firestore에 저장
-      await Provider.of<BookingProvider>(
-        context,
-        listen: false,
-      ).addBooking(newBooking);
-      if (context.mounted) {
+      final created = await context.read<BookingProvider>().createPendingBooking(
+        destination,
+        product,
+      );
+      if (!context.mounted) return;
+
+      if (created) {
         Navigator.pop(context);
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('${product.title} 예약 완료!')));
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('로그인이 필요한 서비스입니다.')));
       }
     } catch (e) {
       if (context.mounted) {
