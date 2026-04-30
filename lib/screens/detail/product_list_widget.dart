@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // [추가] 로딩 UX 개선
+import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import 'product_item_widget.dart';
 import '../../models/trip_destination.dart';
 
@@ -17,25 +17,12 @@ class ProductListWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // [수정] CachedNetworkImage를 사용하여 로딩 Placeholder 및 에러 처리 추가
-          ClipRRect(
+          // 공통 이미지 위젯을 사용해 상세/목록 화면의 로딩 UX를 같은 기준으로 유지
+          AppNetworkImage(
+            imageUrl: destination.imagePath,
+            height: 220,
+            width: double.infinity,
             borderRadius: BorderRadius.circular(16),
-            child: CachedNetworkImage(
-              imageUrl: destination.imagePath,
-              height: 220,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                height: 220,
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              ),
-              errorWidget: (context, url, error) => Container(
-                height: 220,
-                color: theme.colorScheme.surfaceContainerHighest,
-                child: const Icon(Icons.error_outline),
-              ),
-            ),
           ),
           const SizedBox(height: 20),
           Text(
@@ -56,10 +43,11 @@ class ProductListWidget extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: destination.products.length, // 상품의 사이즈에 맞게 동적 설정
             itemBuilder: (context, index) {
-              return Card(
-                // [수정] AppTheme의 CardTheme을 따르도록 하드코딩된 마진 재조정
+              return ProductItemWidget(
+                index,
+                destination,
+                // 목록 내부 카드는 아래 간격만 적용해 CardTheme 기본 margin과 중복되지 않게 함
                 margin: const EdgeInsets.only(bottom: 16),
-                child: ProductItemWidget(index, destination),
               );
             },
           ),

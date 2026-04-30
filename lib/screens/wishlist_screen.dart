@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // [추가]
+import 'package:flutter_pjt/screens/common/app_list_card.dart';
+import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import '../providers/wishlist_provider.dart';
 import '../providers/trip_provider.dart';
+import 'common/app_empty_state.dart';
 import 'detail/product_detail_dialog.dart';
 
 class WishlistScreen extends StatelessWidget {
@@ -19,24 +21,10 @@ class WishlistScreen extends StatelessWidget {
           final wishlistKeys = wishlistProvider.wishlistProductKeys;
 
           if (wishlistKeys.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.favorite_border,
-                    size: 80,
-                    color: theme.colorScheme.tertiary.withValues(alpha: 0.35),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '관심 상품이 없습니다.',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ],
-              ),
+            return AppEmptyState(
+              icon: Icons.favorite_border,
+              title: '관심 상품이 없습니다.',
+              iconColor: theme.colorScheme.tertiary.withValues(alpha: 0.35),
             );
           }
 
@@ -65,72 +53,44 @@ class WishlistScreen extends StatelessWidget {
                 orElse: () => destination.products.first,
               );
 
-              return Card(
-                // [수정] AppTheme의 CardTheme 설정을 따르도록 하여 톤 일치 및 일관성 확보
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    // [수정] Image.network를 CachedNetworkImage로 교체
-                    child: CachedNetworkImage(
-                      imageUrl: destination.imagePath,
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        width: 60,
-                        height: 60,
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        width: 60,
-                        height: 60,
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        child: const Icon(Icons.error_outline),
-                      ),
+              return AppListCard(
+                leading: AppNetworkImage(
+                  imageUrl: destination.imagePath,
+                  width: 60,
+                  height: 60,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                title: Text(product.title, style: theme.textTheme.titleMedium),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    '${destination.name} / ${product.price}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  title: Text(
-                    product.title,
-                    style: theme.textTheme.titleMedium,
+                ),
+                trailing: IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: theme.colorScheme.tertiary,
                   ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      '${destination.name} / ${product.price}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.delete_outline,
-                      color: theme.colorScheme.tertiary,
-                    ),
-                    onPressed: () {
-                      wishlistProvider.toggleWish(destination.id, product);
-                    },
-                  ),
-                  onTap: () {
-                    // [수정] 상세 페이지 이동 대신 다이얼로그 출력
-                    showDialog(
-                      context: context,
-                      builder: (context) => ProductDetailDialog(
-                        destination: destination,
-                        product: product,
-                        imagePath: destination.imagePath,
-                      ),
-                    );
+                  onPressed: () {
+                    wishlistProvider.toggleWish(destination.id, product);
                   },
                 ),
+                onTap: () {
+                  // [수정] 상세 페이지 이동 대신 다이얼로그 출력
+                  showDialog(
+                    context: context,
+                    builder: (context) => ProductDetailDialog(
+                      destination: destination,
+                      product: product,
+                      imagePath: destination.imagePath,
+                    ),
+                  );
+                },
               );
             },
           );

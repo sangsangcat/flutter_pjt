@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // [추가] 이미지 캐싱
+import 'package:flutter_pjt/screens/common/app_list_card.dart';
+import 'package:flutter_pjt/screens/common/app_network_image.dart';
 import '../../models/trip_destination.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../providers/user_provider.dart';
@@ -9,8 +10,14 @@ import 'product_detail_dialog.dart';
 class ProductItemWidget extends StatelessWidget {
   final TripDestination destination;
   final int index;
+  final EdgeInsetsGeometry? margin;
 
-  const ProductItemWidget(this.index, this.destination, {super.key});
+  const ProductItemWidget(
+    this.index,
+    this.destination, {
+    super.key,
+    this.margin,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,35 +28,12 @@ class ProductItemWidget extends StatelessWidget {
         ? destination.products[index]
         : null;
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        // [수정] 직접 CachedNetworkImage를 사용하여 로딩 UI 제어 강화
-        child: CachedNetworkImage(
-          imageUrl: destination.imagePath,
-          width: 64,
-          height: 64,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            width: 64,
-            height: 64,
-            color: theme.colorScheme.surfaceContainerHighest,
-            child: const Center(
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          ),
-          errorWidget: (context, url, error) => Container(
-            width: 64,
-            height: 64,
-            color: theme.colorScheme.surfaceContainerHighest,
-            child: const Icon(Icons.error_outline, size: 20),
-          ),
-        ),
+    return AppListCard(
+      margin: margin,
+      leading: AppNetworkImage(
+        imageUrl: destination.imagePath,
+        width: 64,
+        height: 64,
       ),
       title: Text(
         product?.title ?? '${destination.name} 여행 상품 ${index + 1}',
@@ -78,7 +62,7 @@ class ProductItemWidget extends StatelessWidget {
                     isWished ? Icons.favorite : Icons.favorite_border,
                     color: isWished
                         ? theme.colorScheme.tertiary
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.28),
                   ),
                   onPressed: () =>
                       _handleWishlistToggle(context, wishlist, product),

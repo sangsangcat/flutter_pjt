@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
+import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,9 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('로그인'),
-      ),
+      appBar: AppBar(title: const Text('로그인')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -41,15 +40,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 // [수정] 브랜드 컬러와 테마 스타일 적용
                 Icon(
-                  Icons.lock_person_outlined, 
-                  size: 80, 
+                  Icons.lock_person_outlined,
+                  size: 80,
                   color: theme.colorScheme.primary,
                 ),
                 const SizedBox(height: 24),
                 Text(
                   '환영합니다!',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.displayLarge?.copyWith(fontSize: 28),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -90,7 +91,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       // 이메일 로그인 로직 연결
-                      final success = await context.read<UserProvider>().signInWithEmail(
+                      final success = await context
+                          .read<UserProvider>()
+                          .signInWithEmail(
                             _emailController.text,
                             _passwordController.text,
                           );
@@ -98,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
                       } else if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.')),
+                          const SnackBar(
+                            content: Text('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.'),
+                          ),
                         );
                       }
                     }
@@ -110,23 +115,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 OutlinedButton.icon(
                   onPressed: () async {
                     // UserProvider의 구글 로그인 메서드 호출
-                    final success = await context.read<UserProvider>().signInWithGoogle();
+                    final success = await context
+                        .read<UserProvider>()
+                        .signInWithGoogle();
                     if (success && mounted) {
                       // 로그인 성공 시 홈 화면으로 이동
                       Navigator.pushReplacementNamed(context, AppRoutes.home);
                     } else if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.')),
+                        const SnackBar(
+                          content: Text('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.'),
+                        ),
                       );
                     }
                   },
                   icon: const Icon(Icons.login, size: 18),
                   label: const Text('Google 계정으로 계속하기'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
-                    foregroundColor: theme.colorScheme.onSurface,
-                  ),
+                  style: AppTheme.subtleOutlinedButtonStyle(),
                 ),
                 const SizedBox(height: 32),
                 Row(
@@ -135,20 +140,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       '계정이 없으신가요?',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, AppRoutes.signup);
+                        Navigator.pushReplacementNamed(
+                          context,
+                          AppRoutes.signup,
+                        );
                       },
-                      child: Text(
-                        '회원가입',
-                        style: TextStyle(
-                          color: theme.colorScheme.secondary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      style: AppTheme.accentTextButtonStyle(),
+                      child: const Text('회원가입'),
                     ),
                   ],
                 ),

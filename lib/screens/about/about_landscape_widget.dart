@@ -27,16 +27,12 @@ class AboutLandscapeWidget extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   'Trip App',
-                  style: theme.textTheme.displayLarge?.copyWith(
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     color: theme.colorScheme.primary,
-                    fontSize: 28,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Version 1.0.0',
-                  style: theme.textTheme.bodySmall,
-                ),
+                Text('Version 1.0.0', style: theme.textTheme.bodySmall),
               ],
             ),
           ),

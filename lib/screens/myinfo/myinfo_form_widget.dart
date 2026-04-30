@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
+import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -18,8 +19,8 @@ class MyinfoFormWidget extends StatefulWidget {
 class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
   final nameController = TextEditingController();
   final passwordController = TextEditingController(); // 탈퇴 재인증용
-  String? _tempLocalPath; 
-  bool _isSaving = false; 
+  String? _tempLocalPath;
+  bool _isSaving = false;
   ImagePicker picker = ImagePicker();
 
   @override
@@ -85,7 +86,9 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
     final String newName = nameController.text.trim();
 
     if (newName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('이름을 입력해 주세요.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('이름을 입력해 주세요.')));
       return;
     }
 
@@ -101,9 +104,9 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
       await userProvider.updateDisplayName(newName);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('변경 사항이 성공적으로 저장되었습니다.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('변경 사항이 성공적으로 저장되었습니다.')));
         setState(() {
           _isSaving = false;
           _tempLocalPath = null; // 저장 완료 후 임시 상태 초기화
@@ -112,9 +115,9 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장 중 오류가 발생했습니다.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('저장 중 오류가 발생했습니다.')));
       }
     }
   }
@@ -123,7 +126,8 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
   void showDeleteAccountDialog() {
     final userProvider = context.read<UserProvider>();
     final isGoogleUser = userProvider.isGoogleUser;
-    
+    final theme = Theme.of(context);
+
     passwordController.clear();
 
     showDialog(
@@ -137,7 +141,13 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
             const Text('정말로 탈퇴하시겠습니까? 모든 정보가 삭제됩니다.'),
             if (!isGoogleUser) ...[
               const SizedBox(height: 16),
-              const Text('본인 확인을 위해 비밀번호를 입력해 주세요.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(
+                '본인 확인을 위해 비밀번호를 입력해 주세요.',
+                // 재인증 안내는 화면마다 동일한 중립 톤을 쓰도록 테마의 onSurface 변형값을 사용한다.
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.58),
+                ),
+              ),
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -147,25 +157,35 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
           TextButton(
             onPressed: () async {
               try {
                 final userProvider = context.read<UserProvider>();
                 // 재인증 및 탈퇴 로직 호출
                 await userProvider.reauthenticateAndDelete(
-                  isGoogleUser ? null : passwordController.text.trim()
+                  isGoogleUser ? null : passwordController.text.trim(),
                 );
                 if (mounted) {
-                  Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.home,
+                    (route) => false,
+                  );
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('탈퇴 처리에 실패했습니다.')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('탈퇴 처리에 실패했습니다.')),
+                  );
                 }
               }
             },
-            child: const Text('탈퇴', style: TextStyle(color: Colors.redAccent)),
+            style: AppTheme.dangerTextButtonStyle(),
+            child: const Text('탈퇴'),
           ),
         ],
       ),
@@ -186,6 +206,7 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         final userInfo = userProvider.userInfo;
+        final avatarPath = userInfo?.profileImagePath;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -197,24 +218,37 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                   children: [
                     CircleAvatar(
                       radius: 65,
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
                       // [수정] 분기를 제거하고 CachedNetworkImageProvider 적용 유지.
                       backgroundImage: _tempLocalPath != null
                           ? FileImage(File(_tempLocalPath!)) as ImageProvider
-                          : (userInfo?.profileImagePath != null
-                              ? CachedNetworkImageProvider(userInfo!.profileImagePath!)
-                              : const AssetImage('assets/images/user_basic.jpg') as ImageProvider),
-                      child: _isSaving ? const CircularProgressIndicator(color: Colors.white) : null,
+                          : (avatarPath != null
+                                ? CachedNetworkImageProvider(avatarPath)
+                                : const AssetImage(
+                                        'assets/images/user_basic.jpg',
+                                      )
+                                      as ImageProvider),
+                      child: _isSaving
+                          ? CircularProgressIndicator(
+                              color: theme.colorScheme.onSurface,
+                            )
+                          : null,
                     ),
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: CircleAvatar(
-                        backgroundColor: theme.colorScheme.secondary, // [수정] 브랜드 핑크로 포인트 부여
+                        backgroundColor:
+                            theme.colorScheme.secondary, // [수정] 브랜드 핑크로 포인트 부여
                         radius: 20,
                         child: IconButton(
                           onPressed: _isSaving ? null : showImagePickerDialog,
-                          icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: theme.colorScheme.onSecondary,
+                            size: 20,
+                          ),
                         ),
                       ),
                     ),
@@ -245,16 +279,16 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                   onPressed: () async {
                     await userProvider.signOut();
                     if (mounted) {
-                      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.home,
+                        (route) => false,
+                      );
                     }
                   },
                   icon: const Icon(Icons.logout),
                   label: const Text('로그아웃'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
+                  style: AppTheme.subtleOutlinedButtonStyle(),
                 ),
               ),
               const SizedBox(height: 12),
@@ -266,10 +300,7 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                   onPressed: showDeleteAccountDialog, // 재인증 다이얼로그 호출
                   icon: const Icon(Icons.person_remove_outlined, size: 18),
                   label: const Text('회원 탈퇴'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.redAccent.withValues(alpha: 0.7),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
+                  style: AppTheme.dangerTextButtonStyle(),
                 ),
               ),
             ],

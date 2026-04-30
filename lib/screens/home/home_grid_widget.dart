@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
 import '../../models/trip_destination.dart';
+import '../common/app_empty_state.dart';
 import 'home_grid_item_widget.dart';
 
 class HomeGridWidget extends StatelessWidget {
@@ -10,28 +11,10 @@ class HomeGridWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     if (destinations.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // [수정] 브랜드 컬러를 적용하여 더 세련되고 감성적인 빈 상태 UI 구성
-            Icon(
-              Icons.map_outlined,
-              size: 80,
-              color: theme.colorScheme.primary.withValues(alpha: 0.2),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '해당 카테고리에 등록된 여행지가 없습니다.',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-            ),
-          ],
-        ),
+      return const AppEmptyState(
+        icon: Icons.map_outlined,
+        title: '해당 카테고리에 등록된 여행지가 없습니다.',
       );
     }
 

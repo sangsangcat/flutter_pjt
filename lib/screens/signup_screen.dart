@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
+import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -31,9 +32,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('회원가입'),
-      ),
+      appBar: AppBar(title: const Text('회원가입')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -52,7 +51,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 Text(
                   '새로운 계정을 만드세요',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.displayLarge?.copyWith(fontSize: 24),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -85,7 +86,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) return '이메일을 입력하세요';
                     // 간단한 이메일 형식 체크
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return '유효한 이메일을 입력하세요';
                     }
                     return null;
@@ -114,7 +117,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   obscureText: true,
                   validator: (value) {
-                    if (value != _passwordController.text) return '비밀번호가 일치하지 않습니다';
+                    if (value != _passwordController.text) {
+                      return '비밀번호가 일치하지 않습니다';
+                    }
                     return null;
                   },
                 ),
@@ -123,7 +128,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       // 이메일 회원가입 로직 연결
-                      final success = await context.read<UserProvider>().signUpWithEmail(
+                      final success = await context
+                          .read<UserProvider>()
+                          .signUpWithEmail(
                             _emailController.text,
                             _passwordController.text,
                             _nameController.text,
@@ -136,7 +143,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
                       } else if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('회원가입에 실패했습니다. 이미 가입된 이메일인지 확인하세요.')),
+                          const SnackBar(
+                            content: Text('회원가입에 실패했습니다. 이미 가입된 이메일인지 확인하세요.'),
+                          ),
                         );
                       }
                     }
@@ -150,20 +159,20 @@ class _SignupScreenState extends State<SignupScreen> {
                     Text(
                       '이미 계정이 있으신가요?',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, AppRoutes.login);
+                        Navigator.pushReplacementNamed(
+                          context,
+                          AppRoutes.login,
+                        );
                       },
-                      child: Text(
-                        '로그인',
-                        style: TextStyle(
-                          color: theme.colorScheme.secondary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      style: AppTheme.accentTextButtonStyle(),
+                      child: const Text('로그인'),
                     ),
                   ],
                 ),

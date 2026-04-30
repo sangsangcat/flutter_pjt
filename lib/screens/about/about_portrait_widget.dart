@@ -31,9 +31,8 @@ class AboutPortraitWidget extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             'Trip App',
-            style: theme.textTheme.displayLarge?.copyWith(
+            style: theme.textTheme.headlineSmall?.copyWith(
               color: theme.colorScheme.primary,
-              fontSize: 32,
             ),
           ),
           const SizedBox(height: 8),
@@ -66,10 +65,7 @@ class AboutPortraitWidget extends StatelessWidget {
             context: context,
           ),
           const SizedBox(height: 40),
-          Text(
-            'Version 1.0.0',
-            style: theme.textTheme.bodySmall,
-          ),
+          Text('Version 1.0.0', style: theme.textTheme.bodySmall),
           const SizedBox(height: 24),
         ],
       ),

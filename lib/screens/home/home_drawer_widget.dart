@@ -4,6 +4,7 @@ import 'package:flutter_pjt/providers/user_provider.dart';
 import 'package:flutter_pjt/providers/wishlist_provider.dart';
 import 'package:flutter_pjt/providers/booking_provider.dart';
 import 'package:flutter_pjt/routes/app_routes.dart';
+import 'package:flutter_pjt/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class HomeDrawerWidget extends StatelessWidget {
@@ -23,6 +24,9 @@ class HomeDrawerWidget extends StatelessWidget {
               // [핵심 변경] 로그인 여부에 따라 다른 헤더 UI를 노출
               final bool isLoggedIn = userProvider.hasUserInfo;
               final userInfo = userProvider.userInfo;
+              final avatarPath = userInfo?.profileImagePath;
+              final displayName = userInfo?.name ?? '사용자';
+              final displayEmail = userInfo?.email ?? '';
 
               return Container(
                 width: double.infinity,
@@ -43,16 +47,13 @@ class HomeDrawerWidget extends StatelessWidget {
                               // [수정] 분기 로직 제거 및 캐싱 적용 유지
                               CircleAvatar(
                                 radius: 40,
-                                backgroundColor: Colors.white,
-                                backgroundImage:
-                                    userInfo?.profileImagePath != null
-                                    ? CachedNetworkImageProvider(
-                                        userInfo!.profileImagePath!,
-                                      )
+                                // Drawer 헤더도 테마의 onPrimary 계열을 따라가게 해서 색이 따로 놀지 않도록 맞춘다.
+                                backgroundColor: theme.colorScheme.onPrimary,
+                                backgroundImage: avatarPath != null
+                                    ? CachedNetworkImageProvider(avatarPath)
                                     : const AssetImage(
-                                            'assets/images/user_basic.jpg',
-                                          )
-                                          as ImageProvider,
+                                        'assets/images/user_basic.jpg',
+                                      ),
                               ),
                               const SizedBox(height: 16),
                               ElevatedButton.icon(
@@ -63,36 +64,26 @@ class HomeDrawerWidget extends StatelessWidget {
                                     AppRoutes.myInfo,
                                   );
                                 },
-                                icon: const Icon(Icons.settings, size: 14),
+                                icon: const Icon(Icons.settings, size: 12),
                                 label: const Text('계정 설정'),
-                                style: ElevatedButton.styleFrom(
-                                  // 브랜드 컬러 위에서 돋보이도록 투명도 있는 화이트 스타일
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.15,
-                                  ),
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  minimumSize: const Size(0, 36),
-                                  side: const BorderSide(color: Colors.white24),
-                                ),
+                                style: AppTheme.drawerHeaderActionButtonStyle(),
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                userInfo?.name ?? '사용자',
+                                displayName,
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.titleLarge?.copyWith(
-                                  color: Colors.white,
+                                  color: theme.colorScheme.onPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                userInfo?.email ?? '',
+                                displayEmail,
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.white70,
+                                  color: theme.colorScheme.onPrimary.withValues(
+                                    alpha: 0.7,
+                                  ),
                                 ),
                               ),
                             ],
@@ -101,16 +92,18 @@ class HomeDrawerWidget extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.account_circle,
                                 size: 70,
-                                color: Colors.white38,
+                                color: theme.colorScheme.onPrimary.withValues(
+                                  alpha: 0.38,
+                                ),
                               ),
                               const SizedBox(height: 16),
                               Text(
                                 '로그인이 필요합니다',
                                 style: theme.textTheme.titleMedium?.copyWith(
-                                  color: Colors.white,
+                                  color: theme.colorScheme.onPrimary,
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -125,12 +118,8 @@ class HomeDrawerWidget extends StatelessWidget {
                                         AppRoutes.login,
                                       );
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      foregroundColor:
-                                          theme.colorScheme.primary,
-                                      elevation: 0,
-                                    ),
+                                    style:
+                                        AppTheme.onPrimaryFilledButtonStyle(),
                                     child: const Text('로그인'),
                                   ),
                                   const SizedBox(width: 12),
@@ -142,12 +131,8 @@ class HomeDrawerWidget extends StatelessWidget {
                                         AppRoutes.signup,
                                       );
                                     },
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(
-                                        color: Colors.white54,
-                                      ),
-                                      foregroundColor: Colors.white,
-                                    ),
+                                    style:
+                                        AppTheme.onPrimaryOutlinedButtonStyle(),
                                     child: const Text('회원가입'),
                                   ),
                                 ],

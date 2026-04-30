@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // [추가]
+import 'package:flutter_pjt/screens/common/app_network_image.dart';
+import 'package:flutter_pjt/theme/app_theme.dart';
 import '../../models/trip_destination.dart';
 import '../../models/booking.dart';
 import '../../providers/booking_provider.dart';
@@ -50,32 +51,14 @@ class ProductDetailDialog extends StatelessWidget {
               ],
             ),
           ),
-          // 메인 이미지 - [수정] CachedNetworkImage 적용 및 둥근 모서리 처리
+          // 메인 이미지 - 공통 이미지 위젯으로 다이얼로그와 상세 화면의 로딩 UX를 통일
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ClipRRect(
+            child: AppNetworkImage(
+              imageUrl: imagePath,
+              width: double.infinity,
+              height: 200,
               borderRadius: BorderRadius.circular(16),
-              child: CachedNetworkImage(
-                imageUrl: imagePath,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  height: 200,
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  height: 200,
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.error_outline,
-                    color: theme.colorScheme.error,
-                  ),
-                ),
-              ),
             ),
           ),
           // 상세 정보 영역 (스크롤 가능)
@@ -169,9 +152,7 @@ class ProductDetailDialog extends StatelessWidget {
                       return OutlinedButton.icon(
                         onPressed: () =>
                             _handleWishlistToggle(context, wishlist),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(0, 52),
-                        ),
+                        style: AppTheme.compactOutlinedButtonStyle(),
                         icon: Icon(
                           isWished ? Icons.favorite : Icons.favorite_border,
                           size: 20,
