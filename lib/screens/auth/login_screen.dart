@@ -20,6 +20,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  void _handleBack() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+    navigator.pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -30,7 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('로그인')),
+      appBar: AppBar(
+        title: const Text('로그인'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _handleBack,
+          tooltip: '뒤로가기',
+        ),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -124,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   prompt: '계정이 없으신가요?',
                   actionLabel: '회원가입',
                   onActionTap: () {
-                    Navigator.pushReplacementNamed(context, AppRoutes.signup);
+                    Navigator.pushNamed(context, AppRoutes.signup);
                   },
                 ),
               ],

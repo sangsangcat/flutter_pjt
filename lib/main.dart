@@ -9,7 +9,7 @@ import 'package:flutter_pjt/providers/wishlist_provider.dart';
 import 'package:flutter_pjt/providers/booking_provider.dart';
 import 'package:flutter_pjt/screens/about/about_screen.dart';
 import 'package:flutter_pjt/screens/destination/destination_screen.dart';
-import 'package:flutter_pjt/screens/myinfo/myinfo_screen.dart';
+import 'package:flutter_pjt/screens/auth/account_setting/account_setting_screen.dart';
 import 'package:flutter_pjt/screens/auth/login_screen.dart';
 import 'package:flutter_pjt/screens/auth/signup_screen.dart';
 import 'package:flutter_pjt/screens/wishlist/wishlist_screen.dart';
@@ -61,7 +61,7 @@ class TripApp extends StatelessWidget {
         routes: {
           AppRoutes.home: (context) => const HomeScreen(),
           AppRoutes.about: (context) => AboutScreen(),
-          AppRoutes.myInfo: (context) => MyinfoScreen(),
+          AppRoutes.accountSetting: (context) => const AccountSettingScreen(),
           AppRoutes.login: (context) => const LoginScreen(),
           AppRoutes.signup: (context) => const SignupScreen(),
           // [추가] 관심상품 및 예약 목록 라우트 등록

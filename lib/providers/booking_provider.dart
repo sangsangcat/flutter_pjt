@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/booking.dart';
 import '../models/trip_destination.dart';
-import '../services/firestore_service.dart';
+import '../services/booking_repository.dart';
 
 class BookingProvider with ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+  final BookingRepository _bookingRepository = BookingRepository();
 
   String? _userId;
   List<Booking> _bookings = [];
@@ -24,7 +24,7 @@ class BookingProvider with ChangeNotifier {
 
     if (_userId != null) {
       // 새로운 유저의 예약 내역 실시간 구독
-      _subscription = _firestoreService.getBookingsStream(_userId!).listen((
+      _subscription = _bookingRepository.getBookingsStream(_userId!).listen((
         list,
       ) {
         _bookings = list;
@@ -38,7 +38,7 @@ class BookingProvider with ChangeNotifier {
   /// 예약 추가
   Future<void> addBooking(Booking booking) async {
     if (_userId == null) return;
-    await _firestoreService.addBooking(_userId!, booking);
+    await _bookingRepository.addBooking(_userId!, booking);
   }
 
   /// 상품 정보를 바탕으로 대기 상태 예약을 생성한다.
@@ -65,14 +65,14 @@ class BookingProvider with ChangeNotifier {
   /// 예약 취소
   Future<bool> cancelBooking(String bookingId) async {
     if (_userId == null) return false;
-    await _firestoreService.deleteBooking(_userId!, bookingId);
+    await _bookingRepository.deleteBooking(_userId!, bookingId);
     return true;
   }
 
   /// 결제 완료 처리
   Future<bool> payBooking(String bookingId) async {
     if (_userId == null) return false;
-    await _firestoreService.updateBookingStatus(_userId!, bookingId, 'paid');
+    await _bookingRepository.updateBookingStatus(_userId!, bookingId, 'paid');
     return true;
   }
 

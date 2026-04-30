@@ -45,7 +45,7 @@ class HomeDrawerHeader extends StatelessWidget {
                     ElevatedButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
-                        Navigator.pushNamed(context, AppRoutes.myInfo);
+                        Navigator.pushNamed(context, AppRoutes.accountSetting);
                       },
                       icon: const Icon(Icons.settings, size: 12),
                       label: const Text('계정 설정'),

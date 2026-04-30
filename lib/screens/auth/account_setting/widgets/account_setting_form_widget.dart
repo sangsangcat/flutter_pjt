@@ -8,16 +8,16 @@ import 'delete_account_dialog.dart';
 import 'image_picker_dialog.dart';
 import 'profile_avatar_section.dart';
 
-class MyinfoFormWidget extends StatefulWidget {
-  const MyinfoFormWidget({super.key});
+class AccountSettingFormWidget extends StatefulWidget {
+  const AccountSettingFormWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return MyinfoFormWidgetState();
+    return AccountSettingFormWidgetState();
   }
 }
 
-class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
+class AccountSettingFormWidgetState extends State<AccountSettingFormWidget> {
   final nameController = TextEditingController();
   final passwordController = TextEditingController(); // 탈퇴 재인증용
   String? _tempLocalPath;

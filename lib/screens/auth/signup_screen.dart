@@ -21,6 +21,15 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  void _handleBack() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+    navigator.pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -33,7 +42,14 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('회원가입')),
+      appBar: AppBar(
+        title: const Text('회원가입'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _handleBack,
+          tooltip: '뒤로가기',
+        ),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -142,7 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   prompt: '이미 계정이 있으신가요?',
                   actionLabel: '로그인',
                   onActionTap: () {
-                    Navigator.pushReplacementNamed(context, AppRoutes.login);
+                    Navigator.pushNamed(context, AppRoutes.login);
                   },
                 ),
               ],
