@@ -7,8 +7,9 @@ class HomeMiddleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final tripProvider = Provider.of<TripProvider>(context);
-    
+
     // 카테고리 목록 (데이터가 없는 대륙 추가)
     final continents = [
       {'label': '전체', 'value': 'All'},
@@ -23,16 +24,17 @@ class HomeMiddleWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '인기 여행지',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleLarge, // [수정] 테마 스타일 적용
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: continents.map((continent) {
-              final isSelected = tripProvider.selectedContinent == continent['value'];
+              final isSelected =
+                  tripProvider.selectedContinent == continent['value'];
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: ChoiceChip(
@@ -44,9 +46,15 @@ class HomeMiddleWidget extends StatelessWidget {
                       tripProvider.setContinent(continent['value']!);
                     }
                   },
-                  selectedColor: Colors.blue,
+                  // [수정] 색상과 모양은 AppTheme.chipTheme에 맡겨 대륙 필터도 전역 테마를 따르게 함
                   labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSurface,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    fontSize: 13,
                   ),
                 ),
               );

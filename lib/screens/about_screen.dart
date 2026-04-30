@@ -8,10 +8,8 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('About'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+        title: const Text('About'),
+        // [수정] 하드코딩된 색상 제거하여 AppTheme 적용
         actions: [
           IconButton(
             onPressed: () {
@@ -22,7 +20,7 @@ class AboutScreen extends StatelessWidget {
                 (route) => false,
               );
             },
-            icon: Icon(Icons.home),
+            icon: const Icon(Icons.home_outlined),
           ),
         ],
       ),
@@ -31,9 +29,9 @@ class AboutScreen extends StatelessWidget {
       body: OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.portrait) {
-            return AboutPortraitWidget();
+            return const AboutPortraitWidget();
           } else {
-            return AboutLandscapeWidget();
+            return const AboutLandscapeWidget();
           }
         },
       ),

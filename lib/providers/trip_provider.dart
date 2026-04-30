@@ -13,6 +13,8 @@ class TripProvider with ChangeNotifier {
   List<TripDestination> get destination => filteredDestinations;
   bool get isLoading => _isLoading;
   String get selectedContinent => _selectedContinent;
+  // [추가] 전체 목적지 리스트에 접근할 수 있는 게터
+  List<TripDestination> get allDestinations => _allDestinations;
 
   // 대륙별 필터링 로직
   List<TripDestination> get filteredDestinations {
@@ -88,6 +90,17 @@ class TripProvider with ChangeNotifier {
     try {
       return _allDestinations.firstWhere(
         (destination) => destination.name == name,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // [추가] ID로 여행지 찾기 (관심상품/예약 목록 검색용)
+  TripDestination? getDestinationById(int id) {
+    try {
+      return _allDestinations.firstWhere(
+        (destination) => destination.id == id,
       );
     } catch (e) {
       return null;

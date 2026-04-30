@@ -14,6 +14,7 @@ import 'package:flutter_pjt/screens/login_screen.dart';
 import 'package:flutter_pjt/screens/signup_screen.dart';
 import 'package:flutter_pjt/screens/wishlist_screen.dart'; // 추가
 import 'package:flutter_pjt/screens/booking_screen.dart'; // 추가
+import 'package:flutter_pjt/theme/app_theme.dart'; // 테마 파일 임포트
 import 'package:provider/provider.dart';
 import './routes/app_routes.dart';
 import './screens/home_screen.dart';
@@ -21,8 +22,7 @@ import './screens/home_screen.dart';
 void main() async {
   // 비동기 초기화를 위해 바인딩 확인 및 Firebase 초기화
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // flutterfire configure를 먼저 실행해야 FirebaseOptions.currentPlatform을 사용할 수 있다
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -56,9 +56,8 @@ class TripApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        ),
+        // 정의한 공통 테마 적용
+        theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         initialRoute: AppRoutes.home,
         routes: {

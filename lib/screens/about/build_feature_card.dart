@@ -5,27 +5,31 @@ Widget buildFeatureCard({
   required IconData icon,
   required String title,
   required String description,
+  required BuildContext context, // [추가] 테마 정보 활용을 위해 context 전달 받음
 }) {
+  final theme = Theme.of(context);
+
   return Card(
-    elevation: 2,
+    // [수정] AppTheme의 CardTheme 설정을 따르도록 하드코딩 제거
     child: Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Icon(icon, size: 40, color: Colors.blue),
-          SizedBox(width: 16),
+          // [수정] 브랜드 컬러(Navy) 적용
+          Icon(icon, size: 40, color: theme.colorScheme.primary),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium, // 테마 스타일 적용
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: theme.textTheme.bodySmall, // 테마 스타일 적용
                 ),
               ],
             ),

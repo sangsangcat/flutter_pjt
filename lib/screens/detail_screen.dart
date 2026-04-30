@@ -8,7 +8,7 @@ import './detail/product_list_widget.dart';
 class DetailScreen extends StatefulWidget {
   final TripDestination destination;
 
-  DetailScreen(this.destination);
+  const DetailScreen(this.destination, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -25,6 +25,7 @@ class DetailScreenState extends State<DetailScreen>
     super.initState();
     tabController = TabController(length: 2, vsync: this);
 
+    // 탭 변경 시 뉴스 데이터를 가져오는 기존 로직 유지
     tabController.addListener(() {
       if (tabController.index == 1 && tabController.indexIsChanging) {
         Provider.of<NewsProvider>(
@@ -40,17 +41,12 @@ class DetailScreenState extends State<DetailScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.destination.name),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+        // [수정] 색상/인디케이터는 AppTheme.tabBarTheme을 따르게 두어 테마 변경이 즉시 반영되도록 함
         bottom: TabBar(
           controller: tabController,
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
-          tabs: [
-            Tab(text: '상품'),
-            Tab(text: '뉴스'),
+          tabs: const [
+            Tab(text: '추천 상품'),
+            Tab(text: '현지 뉴스'),
           ],
         ),
       ),
@@ -66,7 +62,7 @@ class DetailScreenState extends State<DetailScreen>
 
   @override
   void dispose() {
-    super.dispose();
     tabController.dispose();
+    super.dispose();
   }
 }

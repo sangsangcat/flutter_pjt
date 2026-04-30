@@ -14,27 +14,58 @@ class ProductItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     // 해당 인덱스에 맞는 실제 상품 데이터 가져오기
     final product = destination.products.length > index
         ? destination.products[index]
         : null;
 
     return ListTile(
-      leading: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          image: DecorationImage(
-            // [수정] NetworkImage 대신 CachedNetworkImageProvider 사용
-            image: CachedNetworkImageProvider(destination.imagePath),
-            fit: BoxFit.cover,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        // [수정] 직접 CachedNetworkImage를 사용하여 로딩 UI 제어 강화
+        child: CachedNetworkImage(
+          imageUrl: destination.imagePath,
+          width: 64,
+          height: 64,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Container(
+            width: 64,
+            height: 64,
+            color: theme.colorScheme.surfaceContainerHighest,
+            child: const Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+            width: 64,
+            height: 64,
+            color: theme.colorScheme.surfaceContainerHighest,
+            child: const Icon(Icons.error_outline, size: 20),
           ),
         ),
       ),
-      title: Text(product?.title ?? '${destination.name} 여행 상품 ${index + 1}'),
-      subtitle: Text(product != null ? '${product.price}부터' : '가격 정보 준비 중'),
-      // [수정] 우측 영역에 하트 버튼(찜)과 이동 아이콘 배치
+      title: Text(
+        product?.title ?? '${destination.name} 여행 상품 ${index + 1}',
+        style: theme.textTheme.titleMedium,
+      ),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4.0),
+        child: Text(
+          product != null ? '${product.price}부터' : '가격 정보 준비 중',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      // 선택된 하트에만 테마의 핑크 포인트를 사용해 과한 강조를 피함
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -45,14 +76,20 @@ class ProductItemWidget extends StatelessWidget {
                 return IconButton(
                   icon: Icon(
                     isWished ? Icons.favorite : Icons.favorite_border,
-                    color: isWished ? Colors.red : Colors.grey,
+                    color: isWished
+                        ? theme.colorScheme.tertiary
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                   ),
                   onPressed: () =>
                       _handleWishlistToggle(context, wishlist, product),
                 );
               },
             ),
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 14,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+          ),
         ],
       ),
       onTap: () {
@@ -71,7 +108,7 @@ class ProductItemWidget extends StatelessWidget {
     );
   }
 
-  /// 찜하기 토글 및 로그인 상태 확인
+  /// 찜하기 토글 및 로그인 상태 확인 로직 유지
   void _handleWishlistToggle(
     BuildContext context,
     WishlistProvider wishlist,

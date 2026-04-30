@@ -19,41 +19,72 @@ class NewsItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ListTile(
-      leading: article.urlToImage != null
-          ? Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  // [수정] NetworkImage를 CachedNetworkImageProvider로 교체
-                  image: CachedNetworkImageProvider(article.urlToImage!),
-                  fit: BoxFit.cover,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        // [수정] 직접 CachedNetworkImage를 사용하여 로딩 UI 제어 강화
+        child: article.urlToImage != null
+            ? CachedNetworkImage(
+                imageUrl: article.urlToImage!,
+                width: 64,
+                height: 64,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  width: 64,
+                  height: 64,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  width: 64,
+                  height: 64,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: const Icon(Icons.broken_image_outlined, size: 20),
+                ),
+              )
+            : Container(
+                width: 64,
+                height: 64,
+                color: theme.colorScheme.surfaceContainerHighest,
+                child: Icon(
+                  Icons.article_outlined, 
+                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
                 ),
               ),
-            )
-          : Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.grey.shade300,
-              ),
-            ),
-      title: Text(article.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+      ),
+      title: Text(
+        article.title, 
+        maxLines: 2, 
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.titleMedium,
+      ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 4),
           Text(
             article.description,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            article.source ?? '',
-            style: const TextStyle(fontSize: 12, color: Colors.blue),
+            article.source ?? '뉴스 출처',
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 12, 
+              color: theme.colorScheme.primary, // [수정] 브랜드 네이비 적용
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),

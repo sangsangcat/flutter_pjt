@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // [추가] 로딩 UX 개선
 import 'product_item_widget.dart';
 import '../../models/trip_destination.dart';
 
@@ -9,31 +10,42 @@ class ProductListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 200,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image: NetworkImage(destination.imagePath),
-                fit: BoxFit.cover,
+          // [수정] CachedNetworkImage를 사용하여 로딩 Placeholder 및 에러 처리 추가
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: CachedNetworkImage(
+              imageUrl: destination.imagePath,
+              height: 220,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                height: 220,
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              ),
+              errorWidget: (context, url, error) => Container(
+                height: 220,
+                color: theme.colorScheme.surfaceContainerHighest,
+                child: const Icon(Icons.error_outline),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             destination.description,
-            style: const TextStyle(fontSize: 16, color: Colors.black),
+            style: theme.textTheme.bodyLarge, // 테마 스타일 적용
           ),
-          const SizedBox(height: 24),
-          const Text(
+          const SizedBox(height: 32),
+          Text(
             '추천 상품',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge, // 테마 스타일 적용
           ),
           const SizedBox(height: 16),
           ListView.builder(
@@ -45,7 +57,8 @@ class ProductListWidget extends StatelessWidget {
             itemCount: destination.products.length, // 상품의 사이즈에 맞게 동적 설정
             itemBuilder: (context, index) {
               return Card(
-                margin: const EdgeInsets.only(bottom: 12),
+                // [수정] AppTheme의 CardTheme을 따르도록 하드코딩된 마진 재조정
+                margin: const EdgeInsets.only(bottom: 16),
                 child: ProductItemWidget(index, destination),
               );
             },

@@ -11,7 +11,10 @@ class HomeDrawerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // [추가] 테마 정보 활용
+
     return Drawer(
+      backgroundColor: theme.colorScheme.surface,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -23,22 +26,23 @@ class HomeDrawerWidget extends StatelessWidget {
 
               return Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(color: Colors.blue),
+                // [수정] 브랜드 컬러(Navy)를 헤더 배경으로 적용
+                decoration: BoxDecoration(color: theme.colorScheme.primary),
                 child: SafeArea(
                   bottom: false, // 하단은 ListView와 이어지므로 상단만 적용
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 24,
-                      horizontal: 16,
+                      vertical: 32, // 여백을 소폭 늘려 쾌적하게 조정
+                      horizontal: 20,
                     ),
                     child: isLoggedIn
                         ? Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // [수정] 분기 로직 제거 및 캐싱 적용
+                              // [수정] 분기 로직 제거 및 캐싱 적용 유지
                               CircleAvatar(
-                                radius: 35,
+                                radius: 40,
                                 backgroundColor: Colors.white,
                                 backgroundImage:
                                     userInfo?.profileImagePath != null
@@ -50,7 +54,7 @@ class HomeDrawerWidget extends StatelessWidget {
                                           )
                                           as ImageProvider,
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 16),
                               ElevatedButton.icon(
                                 onPressed: () {
                                   Navigator.pop(context);
@@ -59,34 +63,36 @@ class HomeDrawerWidget extends StatelessWidget {
                                     AppRoutes.myInfo,
                                   );
                                 },
-                                icon: const Icon(Icons.settings, size: 16),
+                                icon: const Icon(Icons.settings, size: 14),
                                 label: const Text('계정 설정'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.blue,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
+                                  // 브랜드 컬러 위에서 돋보이도록 투명도 있는 화이트 스타일
+                                  backgroundColor: Colors.white.withValues(
+                                    alpha: 0.15,
                                   ),
-                                  minimumSize: const Size(0, 32),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  minimumSize: const Size(0, 36),
+                                  side: const BorderSide(color: Colors.white24),
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 16),
                               Text(
                                 userInfo?.name ?? '사용자',
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
+                                style: theme.textTheme.titleLarge?.copyWith(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 userInfo?.email ?? '',
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   color: Colors.white70,
-                                  fontSize: 13,
                                 ),
                               ),
                             ],
@@ -97,18 +103,17 @@ class HomeDrawerWidget extends StatelessWidget {
                             children: [
                               const Icon(
                                 Icons.account_circle,
-                                size: 60,
-                                color: Colors.white54,
-                              ),
-                              const SizedBox(height: 12),
-                              const Text(
-                                '로그인이 필요합니다',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
+                                size: 70,
+                                color: Colors.white38,
                               ),
                               const SizedBox(height: 16),
+                              Text(
+                                '로그인이 필요합니다',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -122,11 +127,13 @@ class HomeDrawerWidget extends StatelessWidget {
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
-                                      foregroundColor: Colors.blue,
+                                      foregroundColor:
+                                          theme.colorScheme.primary,
+                                      elevation: 0,
                                     ),
                                     child: const Text('로그인'),
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 12),
                                   OutlinedButton(
                                     onPressed: () {
                                       Navigator.pop(context);
@@ -137,7 +144,7 @@ class HomeDrawerWidget extends StatelessWidget {
                                     },
                                     style: OutlinedButton.styleFrom(
                                       side: const BorderSide(
-                                        color: Colors.white,
+                                        color: Colors.white54,
                                       ),
                                       foregroundColor: Colors.white,
                                     ),
@@ -152,16 +159,17 @@ class HomeDrawerWidget extends StatelessWidget {
               );
             },
           ),
+          const SizedBox(height: 8),
           // 관심상품 메뉴
           Consumer<WishlistProvider>(
             builder: (context, wishlist, child) {
               return ListTile(
-                leading: Badge(
-                  label: Text('${wishlist.count}'),
-                  isLabelVisible: wishlist.count > 0,
-                  child: const Icon(Icons.favorite),
+                leading: _DrawerBadgeIcon(
+                  icon: Icons.favorite_border,
+                  count: wishlist.count,
+                  iconColor: theme.colorScheme.primary,
                 ),
-                title: const Text('관심상품'),
+                title: Text('관심상품', style: theme.textTheme.bodyLarge),
                 onTap: () {
                   Navigator.pop(context); // Drawer 닫기
                   Navigator.pushNamed(context, AppRoutes.wishlist);
@@ -173,12 +181,12 @@ class HomeDrawerWidget extends StatelessWidget {
           Consumer<BookingProvider>(
             builder: (context, booking, child) {
               return ListTile(
-                leading: Badge(
-                  label: Text('${booking.count}'),
-                  isLabelVisible: booking.count > 0,
-                  child: const Icon(Icons.card_travel),
+                leading: _DrawerBadgeIcon(
+                  icon: Icons.card_travel,
+                  count: booking.count,
+                  iconColor: theme.colorScheme.primary,
                 ),
-                title: const Text('예약 목록'),
+                title: Text('예약 목록', style: theme.textTheme.bodyLarge),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, AppRoutes.booking);
@@ -186,15 +194,51 @@ class HomeDrawerWidget extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
+          const Divider(indent: 16, endIndent: 16),
           ListTile(
-            leading: const Icon(Icons.info),
-            title: const Text('About'),
+            leading: Icon(Icons.info_outline, color: theme.colorScheme.primary),
+            title: Text('About', style: theme.textTheme.bodyLarge),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.about);
             },
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DrawerBadgeIcon extends StatelessWidget {
+  final IconData icon;
+  final int count;
+  final Color iconColor;
+
+  const _DrawerBadgeIcon({
+    required this.icon,
+    required this.count,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Icon(icon, color: iconColor),
+          ),
+          if (count > 0)
+            // 배지를 아이콘 바깥 오른쪽 하단으로 빼서 아이콘 형태가 가려지지 않게 함
+            Positioned(
+              right: -4,
+              bottom: -2,
+              child: Badge(label: Text('$count')),
+            ),
         ],
       ),
     );

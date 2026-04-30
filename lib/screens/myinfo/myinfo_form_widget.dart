@@ -165,7 +165,7 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                 }
               }
             },
-            child: const Text('탈퇴', style: TextStyle(color: Colors.red)),
+            child: const Text('탈퇴', style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -181,6 +181,8 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         final userInfo = userProvider.userInfo;
@@ -195,8 +197,8 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                   children: [
                     CircleAvatar(
                       radius: 65,
-                      backgroundColor: Colors.grey[200],
-                      // [수정] 분기를 제거하고 CachedNetworkImageProvider 적용. 편집 중인 임시 파일만 FileImage 사용.
+                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                      // [수정] 분기를 제거하고 CachedNetworkImageProvider 적용 유지.
                       backgroundImage: _tempLocalPath != null
                           ? FileImage(File(_tempLocalPath!)) as ImageProvider
                           : (userInfo?.profileImagePath != null
@@ -208,11 +210,11 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                       bottom: 0,
                       right: 0,
                       child: CircleAvatar(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: theme.colorScheme.secondary, // [수정] 브랜드 핑크로 포인트 부여
                         radius: 20,
                         child: IconButton(
                           onPressed: _isSaving ? null : showImagePickerDialog,
-                          icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                          icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
                         ),
                       ),
                     ),
@@ -224,22 +226,13 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                 controller: nameController,
                 decoration: const InputDecoration(
                   labelText: '이름',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+                  prefixIcon: Icon(Icons.person_outline),
                 ),
               ),
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isSaving ? null : saveUserInfo,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text(_isSaving ? '저장 중...' : '정보 저장'),
-                ),
+              ElevatedButton(
+                onPressed: _isSaving ? null : saveUserInfo,
+                child: Text(_isSaving ? '저장 중...' : '변경 사항 저장'),
               ),
               const SizedBox(height: 48),
               const Divider(),
@@ -258,9 +251,9 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
                   icon: const Icon(Icons.logout),
                   label: const Text('로그아웃'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.grey[700],
-                    side: BorderSide(color: Colors.grey[400]!),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
               ),
@@ -269,13 +262,12 @@ class MyinfoFormWidgetState extends State<MyinfoFormWidget> {
               // 회원 탈퇴 버튼
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton.icon(
+                child: TextButton.icon(
                   onPressed: showDeleteAccountDialog, // 재인증 다이얼로그 호출
-                  icon: const Icon(Icons.person_remove),
+                  icon: const Icon(Icons.person_remove_outlined, size: 18),
                   label: const Text('회원 탈퇴'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.grey[700],
-                    side: BorderSide(color: Colors.grey[400]!),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.redAccent.withValues(alpha: 0.7),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),

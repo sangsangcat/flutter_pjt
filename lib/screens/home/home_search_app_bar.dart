@@ -75,6 +75,8 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return AppBar(
       title: _isSearching
           ? Autocomplete<String>(
@@ -95,11 +97,12 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
                       controller: controller,
                       focusNode: focusNode,
                       autofocus: true,
-                      style: const TextStyle(color: Colors.black87),
+                      // 테마의 텍스트 스타일 적용
+                      style: theme.textTheme.bodyLarge,
                       decoration: const InputDecoration(
-                        hintText: '검색어를 입력하세요...',
-                        hintStyle: TextStyle(color: Colors.black45),
-                        border: InputBorder.none,
+                        hintText: '어디로 떠나고 싶으신가요?',
+                        // InputDecorationTheme이 정의되어 있어 상세 설정 생략 가능
+                        prefixIcon: Icon(Icons.search, size: 20),
                       ),
                       onSubmitted: (value) {
                         _onSearchSubmitted(value);
@@ -109,35 +112,48 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
               optionsViewBuilder: (context, onSelected, options) {
                 return Align(
                   alignment: Alignment.topLeft,
-                  child: Material(
-                    elevation: 4.0,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width - 100,
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        itemCount: options.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final String option = options.elementAt(index);
-                          return ListTile(
-                            leading: const Icon(Icons.history, size: 20),
-                            title: Text(option),
-                            onTap: () => onSelected(option),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.close, size: 18),
-                              onPressed: () {
-                                _deleteSearchTerm(option);
-                              },
-                            ),
-                          );
-                        },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Material(
+                      elevation: 8.0,
+                      borderRadius: BorderRadius.circular(12),
+                      clipBehavior: Clip.antiAlias,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width - 64,
+                        color: theme.cardTheme.color,
+                        child: ListView.separated(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          separatorBuilder: (context, index) => Divider(
+                            height: 1,
+                            color: theme.dividerColor.withValues(alpha: 0.1),
+                          ),
+                          itemBuilder: (BuildContext context, int index) {
+                            final String option = options.elementAt(index);
+                            return ListTile(
+                              leading: const Icon(Icons.history, size: 20),
+                              title: Text(option, style: theme.textTheme.bodyMedium),
+                              onTap: () => onSelected(option),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.close, size: 18),
+                                onPressed: () {
+                                  _deleteSearchTerm(option);
+                                },
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
                 );
               },
             )
-          : const Text('Trip App'),
+          : Text(
+              'Trip App',
+              style: theme.appBarTheme.titleTextStyle,
+            ),
       actions: [
         IconButton(
           onPressed: () {
@@ -146,9 +162,14 @@ class _HomeSearchAppBarState extends State<HomeSearchAppBar> {
             });
           },
           icon: Icon(_isSearching ? Icons.close : Icons.search),
+          color: theme.appBarTheme.iconTheme?.color,
         ),
         if (!_isSearching)
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+          IconButton(
+            onPressed: () {}, 
+            icon: const Icon(Icons.notifications_none),
+            color: theme.appBarTheme.iconTheme?.color,
+          ),
       ],
     );
   }
